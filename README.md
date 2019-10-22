@@ -1,0 +1,1 @@
+ygoprodeck-tag-bot
