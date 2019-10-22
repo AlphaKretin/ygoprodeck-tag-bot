@@ -81,6 +81,26 @@ function updateTagMap() {
         });
     });
 }
+function messageCapSlice(outString) {
+    var outStrings = [];
+    var MESSAGE_CAP = 2000;
+    while (outString.length > MESSAGE_CAP) {
+        var index = outString.slice(0, MESSAGE_CAP).lastIndexOf("\n");
+        if (index === -1 || index >= MESSAGE_CAP) {
+            index = outString.slice(0, MESSAGE_CAP).lastIndexOf(".");
+            if (index === -1 || index >= MESSAGE_CAP) {
+                index = outString.slice(0, MESSAGE_CAP).lastIndexOf(" ");
+                if (index === -1 || index >= MESSAGE_CAP) {
+                    index = MESSAGE_CAP - 1;
+                }
+            }
+        }
+        outStrings.push(outString.slice(0, index + 1));
+        outString = outString.slice(index + 1);
+    }
+    outStrings.push(outString);
+    return outStrings;
+}
 bot.on("messageCreate", function (msg) {
     if (msg.author.bot || !msg.content.startsWith(config_json_1.prefix)) {
         return;
@@ -98,7 +118,36 @@ bot.on("messageCreate", function (msg) {
         return;
     }
     if (command.startsWith("archives")) {
-        msg.channel.createMessage("This bot can display the following deck tags:\n`" + fullTagNames.join("`, `") + "`");
+        var out = "This bot can display the following deck tags:\n`" + fullTagNames.join("`, `") + "`";
+        var outMessages_1 = messageCapSlice(out);
+        if (outMessages_1.length > 1) {
+            msg.channel.createMessage("This list of archives is very long! It takes multiple messages, so I'll send it to you in a DM").then(function () { return __awaiter(void 0, void 0, void 0, function () {
+                var chan, _i, outMessages_2, mes;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, msg.author.getDMChannel()];
+                        case 1:
+                            chan = _a.sent();
+                            _i = 0, outMessages_2 = outMessages_1;
+                            _a.label = 2;
+                        case 2:
+                            if (!(_i < outMessages_2.length)) return [3 /*break*/, 5];
+                            mes = outMessages_2[_i];
+                            return [4 /*yield*/, chan.createMessage(mes)];
+                        case 3:
+                            _a.sent();
+                            _a.label = 4;
+                        case 4:
+                            _i++;
+                            return [3 /*break*/, 2];
+                        case 5: return [2 /*return*/];
+                    }
+                });
+            }); });
+        }
+        else {
+            msg.channel.createMessage(out);
+        }
         return;
     }
     for (var tag in tagMap) {

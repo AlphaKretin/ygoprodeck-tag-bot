@@ -25,6 +25,28 @@ async function updateTagMap(): Promise<void> {
 	}
 }
 
+function messageCapSlice(outString: string): string[] {
+	const outStrings: string[] = [];
+	const MESSAGE_CAP = 2000;
+	while (outString.length > MESSAGE_CAP) {
+		let index = outString.slice(0, MESSAGE_CAP).lastIndexOf("\n");
+		if (index === -1 || index >= MESSAGE_CAP) {
+			index = outString.slice(0, MESSAGE_CAP).lastIndexOf(".");
+			if (index === -1 || index >= MESSAGE_CAP) {
+				index = outString.slice(0, MESSAGE_CAP).lastIndexOf(" ");
+				if (index === -1 || index >= MESSAGE_CAP) {
+					index = MESSAGE_CAP - 1;
+				}
+			}
+		}
+		outStrings.push(outString.slice(0, index + 1));
+		outString = outString.slice(index + 1);
+	}
+	outStrings.push(outString);
+	return outStrings;
+}
+
+
 bot.on("messageCreate", msg => {
 	if (msg.author.bot || !msg.content.startsWith(prefix)) {
 		return;
@@ -43,7 +65,18 @@ bot.on("messageCreate", msg => {
 	}
 
 	if (command.startsWith("archives")) {
-		msg.channel.createMessage("This bot can display the following deck tags:\n`" + fullTagNames.join("`, `") + "`");
+		const out = "This bot can display the following deck tags:\n`" + fullTagNames.join("`, `") + "`";
+		const outMessages = messageCapSlice(out);
+		if (outMessages.length > 1) {
+			msg.channel.createMessage("This list of archives is very long! It takes multiple messages, so I'll send it to you in a DM").then(async () => {
+				const chan = await msg.author.getDMChannel();
+				for (const mes of outMessages) {
+					await chan.createMessage(mes);
+				}
+			});
+		} else {
+			msg.channel.createMessage(out);
+		}
 		return;
 	}
 
