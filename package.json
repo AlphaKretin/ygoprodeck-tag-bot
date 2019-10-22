@@ -1,0 +1,30 @@
+{
+  "name": "ygoprodeck-tag-bot",
+  "version": "1.0.0",
+  "description": "A Discord bot to display deck tags from YGOPRODeck on command",
+  "main": "tagbot.js",
+  "scripts": {
+    "test": "node tagbot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlphaKretin/ygoprodeck-tag-bot.git"
+  },
+  "keywords": [
+    "discord",
+    "yu-gi-oh"
+  ],
+  "author": "AlphaKretin",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/AlphaKretin/ygoprodeck-tag-bot/issues"
+  },
+  "homepage": "https://github.com/AlphaKretin/ygoprodeck-tag-bot#readme",
+  "dependencies": {
+    "eris": "^0.11.0",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.6.4"
+  }
+}
