@@ -4,7 +4,9 @@
   "description": "A Discord bot to display deck tags from YGOPRODeck on command",
   "main": "tagbot.js",
   "scripts": {
-    "test": "node tagbot"
+    "run": "node tagbot",
+    "build": "./node_modules/.bin/tsc",
+    "lint": "./node_modules/.bin/eslint tagbot.ts --fix"
   },
   "repository": {
     "type": "git",
@@ -25,6 +27,10 @@
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
+    "@types/node-fetch": "^2.5.2",
+    "@typescript-eslint/eslint-plugin": "^2.5.0",
+    "@typescript-eslint/parser": "^2.5.0",
+    "eslint": "^6.5.1",
     "typescript": "^3.6.4"
   }
 }
