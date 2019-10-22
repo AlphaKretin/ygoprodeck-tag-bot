@@ -25,7 +25,6 @@ async function updateTagMap(): Promise<void> {
 	for (let i = 0; i < Math.min(tags.length, links.length); i++) {
 		tagMap[tags[i]] = links[i];
 	}
-	console.log("breakpoint goes here");
 }
 
 function messageCapSlice(outString: string): string[] {

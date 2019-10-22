@@ -77,7 +77,6 @@ function updateTagMap() {
                     for (i = 0; i < Math.min(tags.length, links.length); i++) {
                         tagMap[tags[i]] = links[i];
                     }
-                    console.log("breakpoint goes here");
                     return [2 /*return*/];
             }
         });
