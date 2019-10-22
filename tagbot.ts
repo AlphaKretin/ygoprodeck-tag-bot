@@ -3,6 +3,8 @@ import fetch from "node-fetch";
 import {token, admins} from "./auth.json";
 import {prefix, source} from "./config.json";
 
+process.on("unhandledRejection", error => console.error(error));
+
 const bot = new Eris.Client(token);
 let tagMap: {[tag: string]: string} = {};
 let fullTagNames: string[] = [];
@@ -16,13 +18,14 @@ async function updateTagMap(): Promise<void> {
 	const rawResponse = await fetch(source);
 	const rawContent = await rawResponse.text();
 	const halves = rawContent.split("Links:");
-	fullTagNames = halves[0].split(/\r\n|\r|\n/);
+	fullTagNames = halves[0].split(/\r\n|\r|\n/).filter(v => v !== "");
 	const tags = fullTagNames.map(cleanString);
-	const links = halves[1].split(/\r\n|\r|\n/);
+	const links = halves[1].split(/\r\n|\r|\n/).filter(v => v !== "");
 	tagMap = {};
 	for (let i = 0; i < Math.min(tags.length, links.length); i++) {
 		tagMap[tags[i]] = links[i];
 	}
+	console.log("breakpoint goes here");
 }
 
 function messageCapSlice(outString: string): string[] {
@@ -83,6 +86,7 @@ bot.on("messageCreate", msg => {
 	for (const tag in tagMap) {
 		if (command.startsWith(tag)) {
 			msg.channel.createMessage(tagMap[tag]);
+			return;
 		}
 	}
 });

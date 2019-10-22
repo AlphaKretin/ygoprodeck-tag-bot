@@ -50,6 +50,7 @@ var Eris = __importStar(require("eris"));
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var auth_json_1 = require("./auth.json");
 var config_json_1 = require("./config.json");
+process.on("unhandledRejection", function (error) { return console.error(error); });
 var bot = new Eris.Client(auth_json_1.token);
 var tagMap = {};
 var fullTagNames = [];
@@ -69,13 +70,14 @@ function updateTagMap() {
                 case 2:
                     rawContent = _a.sent();
                     halves = rawContent.split("Links:");
-                    fullTagNames = halves[0].split(/\r\n|\r|\n/);
+                    fullTagNames = halves[0].split(/\r\n|\r|\n/).filter(function (v) { return v !== ""; });
                     tags = fullTagNames.map(cleanString);
-                    links = halves[1].split(/\r\n|\r|\n/);
+                    links = halves[1].split(/\r\n|\r|\n/).filter(function (v) { return v !== ""; });
                     tagMap = {};
                     for (i = 0; i < Math.min(tags.length, links.length); i++) {
                         tagMap[tags[i]] = links[i];
                     }
+                    console.log("breakpoint goes here");
                     return [2 /*return*/];
             }
         });
@@ -153,6 +155,7 @@ bot.on("messageCreate", function (msg) {
     for (var tag in tagMap) {
         if (command.startsWith(tag)) {
             msg.channel.createMessage(tagMap[tag]);
+            return;
         }
     }
 });
@@ -162,3 +165,4 @@ bot.on("ready", function () {
     updateTagMap().then(function () { return console.log("Tags updated, ready to go!"); });
 });
 bot.connect();
+//# sourceMappingURL=tagbot.js.map
