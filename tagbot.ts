@@ -33,7 +33,7 @@ function messageCapSlice(outString: string): string[] {
 	while (outString.length > MESSAGE_CAP) {
 		let index = outString.slice(0, MESSAGE_CAP).lastIndexOf("\n");
 		if (index === -1 || index >= MESSAGE_CAP) {
-			index = outString.slice(0, MESSAGE_CAP).lastIndexOf(".");
+			index = outString.slice(0, MESSAGE_CAP).lastIndexOf(",");
 			if (index === -1 || index >= MESSAGE_CAP) {
 				index = outString.slice(0, MESSAGE_CAP).lastIndexOf(" ");
 				if (index === -1 || index >= MESSAGE_CAP) {
