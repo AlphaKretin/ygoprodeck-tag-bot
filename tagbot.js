@@ -42,126 +42,82 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var Eris = __importStar(require("eris"));
-var node_fetch_1 = __importDefault(require("node-fetch"));
 var auth_json_1 = require("./auth.json");
 var config_json_1 = require("./config.json");
+var tags_1 = require("./modules/tags");
+var util_1 = require("./modules/util");
+var cards_js_1 = require("./modules/cards.js");
 process.on("unhandledRejection", function (error) { return console.error(error); });
 var bot = new Eris.Client(auth_json_1.token);
-var tagMap = {};
-var fullTagNames = [];
-// strip non alpha-numeric characters so that someone searching for "Battlin' Boxer" and "battlingboxer" gets the same result
-function cleanString(s) {
-    return s.toLowerCase().replace(/[\W_]+/g, "");
-}
-function updateTagMap() {
-    return __awaiter(this, void 0, void 0, function () {
-        var rawResponse, rawContent, halves, tags, links, i;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, node_fetch_1.default(config_json_1.source)];
-                case 1:
-                    rawResponse = _a.sent();
-                    return [4 /*yield*/, rawResponse.text()];
-                case 2:
-                    rawContent = _a.sent();
-                    halves = rawContent.split("Links:");
-                    fullTagNames = halves[0].split(/\r\n|\r|\n/).filter(function (v) { return v !== ""; });
-                    tags = fullTagNames.map(cleanString);
-                    links = halves[1].split(/\r\n|\r|\n/).filter(function (v) { return v !== ""; });
-                    tagMap = {};
-                    for (i = 0; i < Math.min(tags.length, links.length); i++) {
-                        tagMap[tags[i]] = links[i];
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-function messageCapSlice(outString) {
-    var outStrings = [];
-    var MESSAGE_CAP = 2000;
-    while (outString.length > MESSAGE_CAP) {
-        var index = outString.slice(0, MESSAGE_CAP).lastIndexOf("\n");
-        if (index === -1 || index >= MESSAGE_CAP) {
-            index = outString.slice(0, MESSAGE_CAP).lastIndexOf(",");
-            if (index === -1 || index >= MESSAGE_CAP) {
-                index = outString.slice(0, MESSAGE_CAP).lastIndexOf(" ");
-                if (index === -1 || index >= MESSAGE_CAP) {
-                    index = MESSAGE_CAP - 1;
-                }
-            }
-        }
-        outStrings.push(outString.slice(0, index + 1));
-        outString = outString.slice(index + 1);
-    }
-    outStrings.push(outString);
-    return outStrings;
-}
+var queryReg = /<([^<]+?)>/g;
 bot.on("messageCreate", function (msg) {
-    if (msg.author.bot || !msg.content.startsWith(config_json_1.prefix)) {
+    if (msg.author.bot) {
         return;
     }
-    var command = cleanString(msg.content);
-    // Update command. Admin-only, updates the list of tags from the source.
-    if (command.startsWith("update") && auth_json_1.admins.includes(msg.author.id)) {
-        msg.channel.createMessage("Updating tag list!").then(function (m) {
-            updateTagMap().then(function () {
-                m.edit("Update complete!");
-            }, function (err) {
-                m.edit("Error!\n```\n" + err + "```");
-            });
-        });
-        return;
-    }
-    if (command.startsWith("archives")) {
-        var out = "This bot can display the following deck tags:\n`" + fullTagNames.join("`, `") + "`";
-        var outMessages_1 = messageCapSlice(out);
-        if (outMessages_1.length > 1) {
-            msg.channel.createMessage("This list of archives is very long! It takes multiple messages, so I'll send it to you in a DM").then(function () { return __awaiter(void 0, void 0, void 0, function () {
-                var chan, _i, outMessages_2, mes;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, msg.author.getDMChannel()];
-                        case 1:
-                            chan = _a.sent();
-                            _i = 0, outMessages_2 = outMessages_1;
-                            _a.label = 2;
-                        case 2:
-                            if (!(_i < outMessages_2.length)) return [3 /*break*/, 5];
-                            mes = outMessages_2[_i];
-                            return [4 /*yield*/, chan.createMessage(mes)];
-                        case 3:
-                            _a.sent();
-                            _a.label = 4;
-                        case 4:
-                            _i++;
-                            return [3 /*break*/, 2];
-                        case 5: return [2 /*return*/];
-                    }
+    if (msg.content.startsWith(config_json_1.prefix)) {
+        var command = util_1.cleanString(msg.content);
+        // Update command. Admin-only, updates the list of tags from the source.
+        if (command.startsWith("update") && auth_json_1.admins.includes(msg.author.id)) {
+            msg.channel.createMessage("Updating tag list!").then(function (m) {
+                tags_1.updateTagMap().then(function () {
+                    m.edit("Update complete!");
+                }, function (err) {
+                    m.edit("Error!\n```\n" + err + "```");
                 });
-            }); });
-        }
-        else {
-            msg.channel.createMessage(out);
-        }
-        return;
-    }
-    for (var tag in tagMap) {
-        if (command.startsWith(tag)) {
-            msg.channel.createMessage(tagMap[tag]);
+            });
             return;
         }
+        if (command.startsWith("archives")) {
+            var out = "This bot can display the following deck tags:\n`" + tags_1.fullTagNames.join("`, `") + "`";
+            var outMessages_1 = util_1.messageCapSlice(out);
+            if (outMessages_1.length > 1) {
+                msg.channel.createMessage("This list of archives is very long! It takes multiple messages, so I'll send it to you in a DM").then(function () { return __awaiter(void 0, void 0, void 0, function () {
+                    var chan, _i, outMessages_2, mes;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, msg.author.getDMChannel()];
+                            case 1:
+                                chan = _a.sent();
+                                _i = 0, outMessages_2 = outMessages_1;
+                                _a.label = 2;
+                            case 2:
+                                if (!(_i < outMessages_2.length)) return [3 /*break*/, 5];
+                                mes = outMessages_2[_i];
+                                return [4 /*yield*/, chan.createMessage(mes)];
+                            case 3:
+                                _a.sent();
+                                _a.label = 4;
+                            case 4:
+                                _i++;
+                                return [3 /*break*/, 2];
+                            case 5: return [2 /*return*/];
+                        }
+                    });
+                }); });
+            }
+            else {
+                msg.channel.createMessage(out).catch(function (e) { return console.error(e); });
+            }
+            return;
+        }
+        for (var tag in tags_1.tagMap) {
+            if (command.startsWith(tag)) {
+                msg.channel.createMessage(tags_1.tagMap[tag]).catch(function (e) { return console.error(e); });
+                return;
+            }
+        }
+    }
+    var result = queryReg.exec(msg.content);
+    if (result !== null) {
+        cards_js_1.searchCard(result[1], msg).catch(function (e) { return console.error(e); });
     }
 });
 bot.on("error", function (err) { return console.error(err); });
 bot.on("ready", function () {
     console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
-    updateTagMap().then(function () { return console.log("Tags updated, ready to go!"); });
+    tags_1.updateTagMap().then(function () { return console.log("Tags updated, ready to go!"); });
 });
 bot.connect();
 //# sourceMappingURL=tagbot.js.map
