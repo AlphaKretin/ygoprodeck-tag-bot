@@ -91,6 +91,17 @@ function parseCardInfo(card) {
         }
     };
     if (outEmbed.embed && outEmbed.embed.fields) {
+        var descs = util_1.messageCapSlice(card.desc);
+        outEmbed.embed.fields.push({
+            name: "Card Text",
+            value: descs[0].length > 0 ? descs[0] : "[no card text]"
+        });
+        for (var i = 1; i < descs.length; i++) {
+            outEmbed.embed.fields.push({
+                name: "Continued",
+                value: descs[i]
+            });
+        }
         if (card.banlist_info) {
             var banlistInfos = [];
             if (card.banlist_info.ban_ocg) {
@@ -108,22 +119,19 @@ function parseCardInfo(card) {
                 inline: true
             });
         }
+        var priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
+        var priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
+        var priceEB = "eBay: $" + card.card_prices.ebay_price;
+        var priceAZ = "Amazon: $" + card.card_prices.amazon_price;
+        priceCM = priceCM.padEnd(priceEB.length);
+        priceTP = priceTP.padEnd(priceAZ.length);
+        priceEB = priceEB.padEnd(priceCM.length);
+        priceAZ = priceAZ.padEnd(priceTP.length);
         outEmbed.embed.fields.push({
             name: "Prices",
-            value: "Cardmarket: " + card.card_prices.cardmarket_price + "\nTCGPlayer: " + card.card_prices.tcgplayer_price + "\neBay: " + card.card_prices.ebay_price + "\nAmazon: " + card.card_prices.amazon_price,
+            value: priceCM + " " + priceTP + "\n" + priceEB + " " + priceAZ,
             inline: true,
         });
-        var descs = util_1.messageCapSlice(card.desc);
-        outEmbed.embed.fields.push({
-            name: "Card Text",
-            value: descs[0].length > 0 ? descs[0] : "[no card text]"
-        });
-        for (var i = 1; i < descs.length; i++) {
-            outEmbed.embed.fields.push({
-                name: "Continued",
-                value: descs[i]
-            });
-        }
     }
     return outEmbed;
 }

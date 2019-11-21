@@ -99,6 +99,17 @@ function parseCardInfo(card: APICard): MessageContent {
 		}
 	};
 	if (outEmbed.embed && outEmbed.embed.fields) {
+		const descs = messageCapSlice(card.desc);
+		outEmbed.embed.fields.push({
+			name: "Card Text",
+			value: descs[0].length > 0 ? descs[0] : "[no card text]"
+		});
+		for (let i = 1; i < descs.length; i++) {
+			outEmbed.embed.fields.push({
+				name: "Continued",
+				value: descs[i]
+			});
+		}
 		if (card.banlist_info) {
 			const banlistInfos = [];
 			if (card.banlist_info.ban_ocg) {
@@ -116,22 +127,22 @@ function parseCardInfo(card: APICard): MessageContent {
 				inline: true
 			});
 		}
+
+		let priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
+		let priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
+		let priceEB = "eBay: $" + card.card_prices.ebay_price;
+		let priceAZ = "Amazon: $" + card.card_prices.amazon_price;
+
+		priceCM = priceCM.padEnd(priceEB.length);
+		priceTP = priceTP.padEnd(priceAZ.length);
+		priceEB = priceEB.padEnd(priceCM.length);
+		priceAZ = priceAZ.padEnd(priceTP.length);
+
 		outEmbed.embed.fields.push({
 			name: "Prices",
-			value: "Cardmarket: " + card.card_prices.cardmarket_price + "\nTCGPlayer: " + card.card_prices.tcgplayer_price + "\neBay: " + card.card_prices.ebay_price + "\nAmazon: " + card.card_prices.amazon_price,
+			value: priceCM + " " + priceTP + "\n" + priceEB + " " + priceAZ,
 			inline: true,
 		});
-		const descs = messageCapSlice(card.desc);
-		outEmbed.embed.fields.push({
-			name: "Card Text",
-			value: descs[0].length > 0 ? descs[0] : "[no card text]"
-		});
-		for (let i = 1; i < descs.length; i++) {
-			outEmbed.embed.fields.push({
-				name: "Continued",
-				value: descs[i]
-			});
-		}
 	}
 	return outEmbed;
 }
