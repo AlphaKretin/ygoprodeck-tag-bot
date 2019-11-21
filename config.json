@@ -1,4 +1,5 @@
 {
     "prefix": ".",
-    "source": "https://ygoprodeck.com/queries/wp_list_archives.php"
+    "source": "https://ygoprodeck.com/queries/wp_list_archives.php",
+    "apisource": "https://db.ygoprodeck.com/api/v5/cardinfo.php?name=%s"
 }

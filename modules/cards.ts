@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
+import { apisource } from "../config.json";
 
 interface APICardSet {
     set_name: string;
@@ -137,7 +138,8 @@ function parseCardInfo(card: APICard): MessageContent {
 
 export async function searchCard(query: string, msg: Message): Promise<void> {
 	try {
-		const res = await fetch(`https://db.ygoprodeck.com/api/v5/cardinfo.php?name=${encodeURIComponent(query)}`);
+		const source = apisource.replace(/%s/, encodeURIComponent(query));
+		const res = await fetch(source);
 		if (res.ok) {
 			const data = await res.json();
 			await msg.channel.createMessage(parseCardInfo(data[0]));

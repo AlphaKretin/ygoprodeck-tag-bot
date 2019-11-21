@@ -41,6 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var util_1 = require("./util");
+var config_json_1 = require("../config.json");
 function generateCardStats(card) {
     var stats = "";
     if (card.archetype) {
@@ -128,12 +129,13 @@ function parseCardInfo(card) {
 }
 function searchCard(query, msg) {
     return __awaiter(this, void 0, void 0, function () {
-        var res, data, e_1;
+        var source, res, data, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 7, , 8]);
-                    return [4 /*yield*/, node_fetch_1.default("https://db.ygoprodeck.com/api/v5/cardinfo.php?name=" + encodeURIComponent(query))];
+                    source = config_json_1.apisource.replace(/%s/, encodeURIComponent(query));
+                    return [4 /*yield*/, node_fetch_1.default(source)];
                 case 1:
                     res = _a.sent();
                     if (!res.ok) return [3 /*break*/, 4];
