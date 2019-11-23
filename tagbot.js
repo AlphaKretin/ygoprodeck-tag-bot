@@ -51,7 +51,6 @@ var util_1 = require("./modules/util");
 var cards_js_1 = require("./modules/cards.js");
 process.on("unhandledRejection", function (error) { return console.error(error); });
 var bot = new Eris.Client(auth_json_1.token);
-var queryReg = /<([^<]+?)>/g;
 bot.on("messageCreate", function (msg) {
     if (msg.author.bot) {
         return;
@@ -109,6 +108,7 @@ bot.on("messageCreate", function (msg) {
             }
         }
     }
+    var queryReg = /<([^<]+?)>/g; // declare anew in-scope to reset index
     var result = queryReg.exec(msg.content);
     if (result !== null) {
         cards_js_1.searchCard(result[1], msg).catch(function (e) { return console.error(e); });
