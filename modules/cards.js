@@ -88,7 +88,8 @@ function parseCardInfo(card) {
             fields: [],
             footer: { text: card.id },
             thumbnail: { url: config_json_1.picsource + card.id + config_json_1.picext },
-            title: card.name
+            title: card.name,
+            url: config_json_1.dbsource + encodeURIComponent(card.name)
         }
     };
     if (outEmbed.embed && outEmbed.embed.fields) {

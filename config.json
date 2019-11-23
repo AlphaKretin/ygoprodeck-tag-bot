@@ -4,5 +4,6 @@
     "apisource": "https://db.ygoprodeck.com/api/v5/cardinfo.php?name=%s",
     "embed": 11688218,
     "picsource": "https://storage.googleapis.com/ygoprodeck.com/pics_artgame/",
-    "picext": ".jpg"
+    "picext": ".jpg",
+    "dbsource": "https://db.ygoprodeck.com/card/?search="
 }
