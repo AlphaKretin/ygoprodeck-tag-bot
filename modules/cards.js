@@ -124,13 +124,9 @@ function parseCardInfo(card) {
         var priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
         var priceEB = "eBay: $" + card.card_prices.ebay_price;
         var priceAZ = "Amazon: $" + card.card_prices.amazon_price;
-        priceCM = priceCM.padEnd(priceEB.length);
-        priceTP = priceTP.padEnd(priceAZ.length);
-        priceEB = priceEB.padEnd(priceCM.length);
-        priceAZ = priceAZ.padEnd(priceTP.length);
         outEmbed.embed.fields.push({
             name: "Prices",
-            value: priceCM + " " + priceTP + "\n" + priceEB + " " + priceAZ,
+            value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
             inline: true,
         });
     }

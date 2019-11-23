@@ -129,19 +129,14 @@ function parseCardInfo(card: APICard): MessageContent {
 			});
 		}
 
-		let priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
-		let priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
-		let priceEB = "eBay: $" + card.card_prices.ebay_price;
-		let priceAZ = "Amazon: $" + card.card_prices.amazon_price;
-
-		priceCM = priceCM.padEnd(priceEB.length);
-		priceTP = priceTP.padEnd(priceAZ.length);
-		priceEB = priceEB.padEnd(priceCM.length);
-		priceAZ = priceAZ.padEnd(priceTP.length);
+		const priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
+		const priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
+		const priceEB = "eBay: $" + card.card_prices.ebay_price;
+		const priceAZ = "Amazon: $" + card.card_prices.amazon_price;
 
 		outEmbed.embed.fields.push({
 			name: "Prices",
-			value: priceCM + " " + priceTP + "\n" + priceEB + " " + priceAZ,
+			value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
 			inline: true,
 		});
 	}
