@@ -83,6 +83,7 @@ function parseCardInfo(card) {
     var stats = generateCardStats(card);
     var outEmbed = {
         embed: {
+            color: config_json_1.embed,
             description: stats,
             fields: [],
             footer: { text: card.id },

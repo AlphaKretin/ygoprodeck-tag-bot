@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
-import { apisource } from "../config.json";
+import { apisource, embed } from "../config.json";
 
 interface APICardSet {
     set_name: string;
@@ -91,6 +91,7 @@ function parseCardInfo(card: APICard): MessageContent {
 	const stats = generateCardStats(card);
 	const outEmbed: MessageContent = {
 		embed: {
+			color: embed,
 			description: stats,
 			fields: [],
 			footer: { text: card.id },
