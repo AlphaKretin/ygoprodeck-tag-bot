@@ -87,7 +87,7 @@ function parseCardInfo(card) {
             description: stats,
             fields: [],
             footer: { text: card.id },
-            //thumbnail: { url: card.imageLink },
+            thumbnail: { url: config_json_1.picsource + card.id + config_json_1.picext },
             title: card.name
         }
     };

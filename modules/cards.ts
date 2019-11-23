@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
-import { apisource, embed } from "../config.json";
+import { apisource, embed, picsource, picext } from "../config.json";
 
 interface APICardSet {
     set_name: string;
@@ -95,7 +95,7 @@ function parseCardInfo(card: APICard): MessageContent {
 			description: stats,
 			fields: [],
 			footer: { text: card.id },
-			//thumbnail: { url: card.imageLink },
+			thumbnail: { url: picsource + card.id + picext },
 			title: card.name
 		}
 	};
