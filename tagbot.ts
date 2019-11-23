@@ -50,7 +50,7 @@ bot.on("messageCreate", msg => {
 			}
 		}
 	}
-	const queryReg = /<([^<]+?)>/g; // declare anew in-scope to reset index
+	const queryReg = /\[([^[]+?)\]/g; // declare anew in-scope to reset index
 	const result = queryReg.exec(msg.content);
 	if (result !== null) {
 		searchCard(result[1], msg).catch(e => console.error(e));

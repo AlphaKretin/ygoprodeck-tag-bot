@@ -108,7 +108,7 @@ bot.on("messageCreate", function (msg) {
             }
         }
     }
-    var queryReg = /<([^<]+?)>/g; // declare anew in-scope to reset index
+    var queryReg = /\[([^[]+?)\]/g; // declare anew in-scope to reset index
     var result = queryReg.exec(msg.content);
     if (result !== null) {
         cards_js_1.searchCard(result[1], msg).catch(function (e) { return console.error(e); });
