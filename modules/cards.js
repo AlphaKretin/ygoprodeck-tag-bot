@@ -42,6 +42,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var util_1 = require("./util");
 var config_json_1 = require("../config.json");
+var cardNames = [];
+function updateCardNames() {
+    return __awaiter(this, void 0, void 0, function () {
+        var rawResponse, allCards;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, node_fetch_1.default(config_json_1.updatesource)];
+                case 1:
+                    rawResponse = _a.sent();
+                    return [4 /*yield*/, rawResponse.json()];
+                case 2:
+                    allCards = _a.sent();
+                    cardNames = allCards.map(function (c) { return c.name; });
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.updateCardNames = updateCardNames;
 function generateCardStats(card) {
     var stats = "";
     if (card.archetype) {

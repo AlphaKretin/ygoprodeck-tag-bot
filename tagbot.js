@@ -51,6 +51,23 @@ var util_1 = require("./modules/util");
 var cards_js_1 = require("./modules/cards.js");
 process.on("unhandledRejection", function (error) { return console.error(error); });
 var bot = new Eris.Client(auth_json_1.token);
+function update() {
+    return __awaiter(this, void 0, void 0, function () {
+        var proms;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    proms = [];
+                    proms.push(tags_1.updateTagMap().then(function () { return console.log("Tags updated"); }));
+                    proms.push(cards_js_1.updateCardNames().then(function () { return console.log("Card names updated"); }));
+                    return [4 /*yield*/, Promise.all(proms)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 bot.on("messageCreate", function (msg) {
     if (msg.author.bot) {
         return;
@@ -59,8 +76,8 @@ bot.on("messageCreate", function (msg) {
         var command = util_1.cleanString(msg.content);
         // Update command. Admin-only, updates the list of tags from the source.
         if (command.startsWith("update") && auth_json_1.admins.includes(msg.author.id)) {
-            msg.channel.createMessage("Updating tag list!").then(function (m) {
-                tags_1.updateTagMap().then(function () {
+            msg.channel.createMessage("Updating!").then(function (m) {
+                update().then(function () {
                     m.edit("Update complete!");
                 }, function (err) {
                     m.edit("Error!\n```\n" + err + "```");
@@ -117,7 +134,7 @@ bot.on("messageCreate", function (msg) {
 bot.on("error", function (err) { return console.error(err); });
 bot.on("ready", function () {
     console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
-    tags_1.updateTagMap().then(function () { return console.log("Tags updated, ready to go!"); });
+    update().then(function () { return console.log("Ready to go!"); });
 });
 bot.connect();
 //# sourceMappingURL=tagbot.js.map

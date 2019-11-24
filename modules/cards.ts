@@ -1,7 +1,15 @@
 import fetch from "node-fetch";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
-import { apisource, embed, picsource, picext, dbsource } from "../config.json";
+import { apisource, updatesource, embed, picsource, picext, dbsource } from "../config.json";
+
+let cardNames: string[] = [];
+
+export async function updateCardNames(): Promise<void> {
+	const rawResponse = await fetch(updatesource);
+	const allCards = await rawResponse.json();
+	cardNames = allCards.map((c: APICard) => c.name);
+}
 
 interface APICardSet {
     set_name: string;

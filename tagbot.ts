@@ -3,11 +3,18 @@ import {token, admins} from "./auth.json";
 import {prefix} from "./config.json";
 import {updateTagMap, fullTagNames, tagMap} from "./modules/tags";
 import {cleanString, messageCapSlice} from "./modules/util";
-import { searchCard } from "./modules/cards.js";
+import { searchCard, updateCardNames } from "./modules/cards.js";
 
 process.on("unhandledRejection", error => console.error(error));
 
 const bot = new Eris.Client(token);
+
+async function update(): Promise<void> {
+	const proms: Array<Promise<void>> = [];
+	proms.push(updateTagMap().then(() => console.log("Tags updated")));
+	proms.push(updateCardNames().then(() => console.log("Card names updated")));
+	await Promise.all(proms);
+}
 
 bot.on("messageCreate", msg => {
 	if (msg.author.bot) {
@@ -17,8 +24,8 @@ bot.on("messageCreate", msg => {
 		const command = cleanString(msg.content);
 		// Update command. Admin-only, updates the list of tags from the source.
 		if (command.startsWith("update") && admins.includes(msg.author.id)) {
-			msg.channel.createMessage("Updating tag list!").then(m => {
-				updateTagMap().then(() => {
+			msg.channel.createMessage("Updating!").then(m => {
+				update().then(() => {
 					m.edit("Update complete!");
 				}, err => {
 					m.edit("Error!\n```\n" + err + "```");
@@ -61,7 +68,7 @@ bot.on("error", err => console.error(err));
 
 bot.on("ready", () => {
 	console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
-	updateTagMap().then(() => console.log("Tags updated, ready to go!"));
+	update().then(() => console.log("Ready to go!"));
 });
 
 bot.connect();
