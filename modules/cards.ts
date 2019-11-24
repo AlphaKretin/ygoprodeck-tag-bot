@@ -2,25 +2,25 @@ import fetch from "node-fetch";
 import fuse from "fuse.js";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
-import { apisource, updatesource, embed, picsource, picext, dbsource } from "../config.json";
+import { apisource, embed, picsource, picext, dbsource } from "../config.json";
 
-const fuseOptions: fuse.FuseOptions<string> = {
+const fuseOptions: fuse.FuseOptions<APICard> = {
 	shouldSort: true,
 	threshold: 0.6,
 	location: 0,
 	distance: 100,
 	maxPatternLength: 32,
 	minMatchCharLength: 1,
+	keys: ["name"]
 };
 
-let cardNames: string[] = [];
-let nameFuzzy = new fuse<string, typeof fuseOptions>(cardNames, fuseOptions);
+let allCards: APICard[] = [];
+let cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptions);
 
 export async function updateCardNames(): Promise<void> {
-	const rawResponse = await fetch(updatesource);
-	const allCards = await rawResponse.json();
-	cardNames = allCards.map((c: APICard) => c.name);
-	nameFuzzy = new fuse<string, typeof fuseOptions>(cardNames, fuseOptions);
+	const rawResponse = await fetch(apisource);
+	allCards = await rawResponse.json();
+	cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptions);
 }
 
 interface APICardSet {
@@ -165,16 +165,11 @@ function parseCardInfo(card: APICard): MessageContent {
 }
 
 export async function searchCard(query: string, msg: Message): Promise<void> {
-	const fuzzyResult = nameFuzzy.search(query);
+	const fuzzyResult = cardFuzzy.search(query);
 	if (fuzzyResult.length > 0) {
-		const cardName = typeof fuzzyResult[0] === "string" ? fuzzyResult[0] : fuzzyResult[0].item;
-		const source = apisource.replace(/%s/, encodeURIComponent(cardName));
-		const res = await fetch(source);
-		if (res.ok) {
-			const data = await res.json();
-			await msg.channel.createMessage(parseCardInfo(data[0]));
-			return;
-		}
+		const card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
+		await msg.channel.createMessage(parseCardInfo(card));
+		return;
 	}
 	await msg.addReaction("❌");
 }
