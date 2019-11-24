@@ -1,8 +1,8 @@
 import * as Eris from "eris";
-import {token, admins} from "./auth.json";
-import {prefix} from "./config.json";
-import {updateTagMap, fullTagNames, tagMap} from "./modules/tags";
-import {cleanString, messageCapSlice} from "./modules/util";
+import { token, admins } from "./auth.json";
+import { prefix } from "./config.json";
+import { updateTagMap, fullTagNames, tagMap } from "./modules/tags";
+import { cleanString, messageCapSlice } from "./modules/util";
 import { searchCard, updateCardNames } from "./modules/cards.js";
 
 process.on("unhandledRejection", error => console.error(error));
