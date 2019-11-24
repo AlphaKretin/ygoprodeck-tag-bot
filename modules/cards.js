@@ -40,9 +40,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var node_fetch_1 = __importDefault(require("node-fetch"));
+var fuse_js_1 = __importDefault(require("fuse.js"));
 var util_1 = require("./util");
 var config_json_1 = require("../config.json");
+var fuseOptions = {
+    shouldSort: true,
+    threshold: 0.6,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+};
 var cardNames = [];
+var nameFuzzy = new fuse_js_1.default(cardNames, fuseOptions);
 function updateCardNames() {
     return __awaiter(this, void 0, void 0, function () {
         var rawResponse, allCards;
@@ -55,6 +65,7 @@ function updateCardNames() {
                 case 2:
                     allCards = _a.sent();
                     cardNames = allCards.map(function (c) { return c.name; });
+                    nameFuzzy = new fuse_js_1.default(cardNames, fuseOptions);
                     return [2 /*return*/];
             }
         });
@@ -154,12 +165,14 @@ function parseCardInfo(card) {
 }
 function searchCard(query, msg) {
     return __awaiter(this, void 0, void 0, function () {
-        var source, res, data, e_1;
+        var fuzzyResult, cardName, source, res, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 7, , 8]);
-                    source = config_json_1.apisource.replace(/%s/, encodeURIComponent(query));
+                    fuzzyResult = nameFuzzy.search(query);
+                    if (!(fuzzyResult.length > 0)) return [3 /*break*/, 4];
+                    cardName = typeof fuzzyResult[0] === "string" ? fuzzyResult[0] : fuzzyResult[0].item;
+                    source = config_json_1.apisource.replace(/%s/, encodeURIComponent(cardName));
                     return [4 /*yield*/, node_fetch_1.default(source)];
                 case 1:
                     res = _a.sent();
@@ -170,17 +183,11 @@ function searchCard(query, msg) {
                     return [4 /*yield*/, msg.channel.createMessage(parseCardInfo(data[0]))];
                 case 3:
                     _a.sent();
-                    return [3 /*break*/, 6];
+                    return [2 /*return*/];
                 case 4: return [4 /*yield*/, msg.addReaction("❌")];
                 case 5:
                     _a.sent();
-                    _a.label = 6;
-                case 6: return [3 /*break*/, 8];
-                case 7:
-                    e_1 = _a.sent();
-                    console.error(e_1);
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    return [2 /*return*/];
             }
         });
     });

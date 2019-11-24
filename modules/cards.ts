@@ -1,14 +1,26 @@
 import fetch from "node-fetch";
+import fuse from "fuse.js";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
 import { apisource, updatesource, embed, picsource, picext, dbsource } from "../config.json";
 
+const fuseOptions: fuse.FuseOptions<string> = {
+	shouldSort: true,
+	threshold: 0.6,
+	location: 0,
+	distance: 100,
+	maxPatternLength: 32,
+	minMatchCharLength: 1,
+};
+
 let cardNames: string[] = [];
+let nameFuzzy = new fuse<string, typeof fuseOptions>(cardNames, fuseOptions);
 
 export async function updateCardNames(): Promise<void> {
 	const rawResponse = await fetch(updatesource);
 	const allCards = await rawResponse.json();
 	cardNames = allCards.map((c: APICard) => c.name);
+	nameFuzzy = new fuse<string, typeof fuseOptions>(cardNames, fuseOptions);
 }
 
 interface APICardSet {
@@ -153,16 +165,16 @@ function parseCardInfo(card: APICard): MessageContent {
 }
 
 export async function searchCard(query: string, msg: Message): Promise<void> {
-	try {
-		const source = apisource.replace(/%s/, encodeURIComponent(query));
+	const fuzzyResult = nameFuzzy.search(query);
+	if (fuzzyResult.length > 0) {
+		const cardName = typeof fuzzyResult[0] === "string" ? fuzzyResult[0] : fuzzyResult[0].item;
+		const source = apisource.replace(/%s/, encodeURIComponent(cardName));
 		const res = await fetch(source);
 		if (res.ok) {
 			const data = await res.json();
 			await msg.channel.createMessage(parseCardInfo(data[0]));
-		} else {
-			await msg.addReaction("❌");
+			return;
 		}
-	} catch (e) {
-		console.error(e);
 	}
+	await msg.addReaction("❌");
 }
