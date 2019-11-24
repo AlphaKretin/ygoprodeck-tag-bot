@@ -50,22 +50,22 @@ var fuseOptions = {
     distance: 100,
     maxPatternLength: 32,
     minMatchCharLength: 1,
+    keys: ["name"]
 };
-var cardNames = [];
-var nameFuzzy = new fuse_js_1.default(cardNames, fuseOptions);
+var allCards = [];
+var cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
 function updateCardNames() {
     return __awaiter(this, void 0, void 0, function () {
-        var rawResponse, allCards;
+        var rawResponse;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, node_fetch_1.default(config_json_1.updatesource)];
+                case 0: return [4 /*yield*/, node_fetch_1.default(config_json_1.apisource)];
                 case 1:
                     rawResponse = _a.sent();
                     return [4 /*yield*/, rawResponse.json()];
                 case 2:
                     allCards = _a.sent();
-                    cardNames = allCards.map(function (c) { return c.name; });
-                    nameFuzzy = new fuse_js_1.default(cardNames, fuseOptions);
+                    cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
                     return [2 /*return*/];
             }
         });
@@ -165,27 +165,19 @@ function parseCardInfo(card) {
 }
 function searchCard(query, msg) {
     return __awaiter(this, void 0, void 0, function () {
-        var fuzzyResult, cardName, source, res, data;
+        var fuzzyResult, card;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    fuzzyResult = nameFuzzy.search(query);
-                    if (!(fuzzyResult.length > 0)) return [3 /*break*/, 4];
-                    cardName = typeof fuzzyResult[0] === "string" ? fuzzyResult[0] : fuzzyResult[0].item;
-                    source = config_json_1.apisource.replace(/%s/, encodeURIComponent(cardName));
-                    return [4 /*yield*/, node_fetch_1.default(source)];
+                    fuzzyResult = cardFuzzy.search(query);
+                    if (!(fuzzyResult.length > 0)) return [3 /*break*/, 2];
+                    card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
+                    return [4 /*yield*/, msg.channel.createMessage(parseCardInfo(card))];
                 case 1:
-                    res = _a.sent();
-                    if (!res.ok) return [3 /*break*/, 4];
-                    return [4 /*yield*/, res.json()];
-                case 2:
-                    data = _a.sent();
-                    return [4 /*yield*/, msg.channel.createMessage(parseCardInfo(data[0]))];
-                case 3:
                     _a.sent();
                     return [2 /*return*/];
-                case 4: return [4 /*yield*/, msg.addReaction("❌")];
-                case 5:
+                case 2: return [4 /*yield*/, msg.addReaction("❌")];
+                case 3:
                     _a.sent();
                     return [2 /*return*/];
             }
