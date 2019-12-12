@@ -46,10 +46,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Eris = __importStar(require("eris"));
 var auth_json_1 = require("./auth.json");
 var config_json_1 = require("./config.json");
+var ftp_1 = require("./modules/ftp");
 var tags_1 = require("./modules/tags");
 var util_1 = require("./modules/util");
 var cards_js_1 = require("./modules/cards.js");
-process.on("unhandledRejection", function (error) { return console.error(error); });
+process.on("unhandledRejection", util_1.errhand);
 var bot = new Eris.Client(auth_json_1.token);
 function update() {
     return __awaiter(this, void 0, void 0, function () {
@@ -114,13 +115,31 @@ bot.on("messageCreate", function (msg) {
                 }); });
             }
             else {
-                msg.channel.createMessage(out).catch(function (e) { return console.error(e); });
+                msg.channel.createMessage(out).catch(util_1.errhand);
             }
             return;
         }
+        if (command.startsWith("deck")) {
+            if (msg.attachments.length < 1) {
+                msg.channel.createMessage("Sorry, you must upload a deck file to use this command.").catch(util_1.errhand);
+                return;
+            }
+            var att = msg.attachments[0];
+            if (!att.filename.endsWith(".ydk")) {
+                msg.channel.createMessage("Sorry, you must upload a `.ydk` file to use this command.").catch(util_1.errhand);
+                return;
+            }
+            if (att.size > config_json_1.deckMaxSize) {
+                msg.channel.createMessage("Sorry, deck files are usually very small, so for security reasons, large files are not considered valid deck files.").catch(util_1.errhand);
+                return;
+            }
+            ftp_1.uploadDeck(att).then(function (url) {
+                msg.channel.createMessage("See your uploaded deck at <" + url + ">!").catch(util_1.errhand);
+            }).catch(util_1.errhand);
+        }
         for (var tag in tags_1.tagMap) {
             if (command.startsWith(tag)) {
-                msg.channel.createMessage(tags_1.tagMap[tag]).catch(function (e) { return console.error(e); });
+                msg.channel.createMessage(tags_1.tagMap[tag]).catch(util_1.errhand);
                 return;
             }
         }
@@ -135,11 +154,11 @@ bot.on("messageCreate", function (msg) {
     if (results.length > 0) {
         var max = Math.min(results.length, config_json_1.maxSearch);
         for (var i = 0; i < max; i++) {
-            cards_js_1.searchCard(results[i], msg).catch(function (e) { return console.error(e); });
+            cards_js_1.searchCard(results[i], msg).catch(util_1.errhand);
         }
     }
 });
-bot.on("error", function (err) { return console.error(err); });
+bot.on("error", util_1.errhand);
 bot.on("ready", function () {
     console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
     update().then(function () { return console.log("Ready to go!"); });

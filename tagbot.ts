@@ -66,7 +66,7 @@ bot.on("messageCreate", msg => {
 				return;
 			}
 			uploadDeck(att).then(url => {
-				msg.channel.createMessage("See your uploaded deck at " + url + "!").catch(errhand);
+				msg.channel.createMessage("See your uploaded deck at <" + url + ">!").catch(errhand);
 			}).catch(errhand);
 		}
 
