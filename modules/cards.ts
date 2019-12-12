@@ -66,7 +66,7 @@ interface APICard {
     scale?: string;
 	archetype?: string;
 	views: string;
-	formats: string;
+	formats?: string;
     card_sets: APICardSet[];
     banlist_info?: APICardBanlist;
     card_images: APICardImage[];
@@ -124,12 +124,16 @@ function formatNumber(num: number): string {
 
 function parseCardInfo(card: APICard): MessageContent {
 	const stats = generateCardStats(card);
+	let footer = card.id + " Views: " + formatNumber(parseInt(card.views, 10));
+	if (card.formats) {
+		footer += " Addt’l. Formats: " + card.formats.replace(/,/g, ", ");
+	}
 	const outEmbed: MessageContent = {
 		embed: {
 			color: embed,
 			description: stats,
 			fields: [],
-			footer: { text: card.id + " Views: " + formatNumber(parseInt(card.views, 10)) + " Addt’l. Formats: " + card.formats.replace(/,/g, ", ") },
+			footer: { text: footer },
 			thumbnail: { url: picsource + card.id + picext },
 			title: card.name,
 			url: dbsource + encodeURIComponent(card.name)

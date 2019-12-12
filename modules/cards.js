@@ -123,12 +123,16 @@ function formatNumber(num) {
 }
 function parseCardInfo(card) {
     var stats = generateCardStats(card);
+    var footer = card.id + " Views: " + formatNumber(parseInt(card.views, 10));
+    if (card.formats) {
+        footer += " Addt’l. Formats: " + card.formats.replace(/,/g, ", ");
+    }
     var outEmbed = {
         embed: {
             color: config_json_1.embed,
             description: stats,
             fields: [],
-            footer: { text: card.id + " Views: " + formatNumber(parseInt(card.views, 10)) + " Addt’l. Formats: " + card.formats.replace(/,/g, ", ") },
+            footer: { text: footer },
             thumbnail: { url: config_json_1.picsource + card.id + config_json_1.picext },
             title: card.name,
             url: config_json_1.dbsource + encodeURIComponent(card.name)
