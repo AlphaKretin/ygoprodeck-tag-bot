@@ -3,6 +3,8 @@ import fuse from "fuse.js";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
 import { apisource, embed, picsource, picext, dbsource } from "../config.json";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const emotes: {[key: string]:  string} = require("../emotes.json"); // required so as to not infer type
 
 const fuseOptions: fuse.FuseOptions<APICard> = {
 	shouldSort: true,
@@ -77,8 +79,14 @@ function generateCardStats(card: APICard): string {
 	stats += "\n";
 	const type = "**Type**: " + card.type + " **Race**: " + card.race; 
 	stats += type;
+	if (card.race in emotes) {
+		stats += " " + emotes[card.race];
+	}
 	if (card.attribute) {
 		stats += " **Attribute**: " + card.attribute;
+		if (card.attribute in emotes) {
+			stats += " " + emotes[card.attribute];
+		}
 	}
 	stats += "\n";
 	if (card.level) {

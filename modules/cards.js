@@ -43,6 +43,8 @@ var node_fetch_1 = __importDefault(require("node-fetch"));
 var fuse_js_1 = __importDefault(require("fuse.js"));
 var util_1 = require("./util");
 var config_json_1 = require("../config.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+var emotes = require("../emotes.json"); // required so as to not infer type
 var fuseOptions = {
     shouldSort: true,
     threshold: 0.6,
@@ -80,8 +82,14 @@ function generateCardStats(card) {
     stats += "\n";
     var type = "**Type**: " + card.type + " **Race**: " + card.race;
     stats += type;
+    if (card.race in emotes) {
+        stats += " " + emotes[card.race];
+    }
     if (card.attribute) {
         stats += " **Attribute**: " + card.attribute;
+        if (card.attribute in emotes) {
+            stats += " " + emotes[card.attribute];
+        }
     }
     stats += "\n";
     if (card.level) {
