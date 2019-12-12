@@ -6,5 +6,7 @@
     "picsource": "https://storage.googleapis.com/ygoprodeck.com/pics_artgame/",
     "picext": ".jpg",
     "dbsource": "https://db.ygoprodeck.com/card/?search=",
-    "maxSearch": 2
+    "maxSearch": 2,
+    "deckSource": "https://ygoprodeck.com/card-database/deck-prices/?u=https://ygoprodeck.com/discord-decks/",
+    "deckMaxSize": 1024
 }

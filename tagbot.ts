@@ -1,11 +1,12 @@
 import * as Eris from "eris";
 import { token, admins } from "./auth.json";
-import { prefix, maxSearch } from "./config.json";
+import { prefix, maxSearch, deckMaxSize } from "./config.json";
+import { uploadDeck } from "./modules/ftp";
 import { updateTagMap, fullTagNames, tagMap } from "./modules/tags";
-import { cleanString, messageCapSlice } from "./modules/util";
+import { cleanString, messageCapSlice, errhand } from "./modules/util";
 import { searchCard, updateCardNames } from "./modules/cards.js";
 
-process.on("unhandledRejection", error => console.error(error));
+process.on("unhandledRejection", errhand);
 
 const bot = new Eris.Client(token);
 
@@ -45,14 +46,33 @@ bot.on("messageCreate", msg => {
 					}
 				});
 			} else {
-				msg.channel.createMessage(out).catch(e => console.error(e));
+				msg.channel.createMessage(out).catch(errhand);
 			}
 			return;
 		}
 
+		if (command.startsWith("deck")) {
+			if (msg.attachments.length < 1) {
+				msg.channel.createMessage("Sorry, you must upload a deck file to use this command.").catch(errhand);
+				return;
+			}
+			const att = msg.attachments[0];
+			if (!att.filename.endsWith(".ydk")) {
+				msg.channel.createMessage("Sorry, you must upload a `.ydk` file to use this command.").catch(errhand);
+				return;
+			}
+			if (att.size > deckMaxSize) {
+				msg.channel.createMessage("Sorry, deck files are usually very small, so for security reasons, large files are not considered valid deck files.").catch(errhand);
+				return;
+			}
+			uploadDeck(att).then(url => {
+				msg.channel.createMessage("See your uploaded deck at " + url + "!").catch(errhand);
+			}).catch(errhand);
+		}
+
 		for (const tag in tagMap) {
 			if (command.startsWith(tag)) {
-				msg.channel.createMessage(tagMap[tag]).catch(e => console.error(e));
+				msg.channel.createMessage(tagMap[tag]).catch(errhand);
 				return;
 			}
 		}
@@ -67,12 +87,12 @@ bot.on("messageCreate", msg => {
 	if (results.length > 0) {
 		const max = Math.min(results.length, maxSearch);
 		for (let i = 0; i < max; i++) {
-			searchCard(results[i], msg).catch(e => console.error(e));
+			searchCard(results[i], msg).catch(errhand);
 		}
 	}
 });
 
-bot.on("error", err => console.error(err));
+bot.on("error", errhand);
 
 bot.on("ready", () => {
 	console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
