@@ -64,7 +64,9 @@ interface APICard {
     race: string;
     attribute?: string;
     scale?: string;
-    archetype?: string;
+	archetype?: string;
+	views: string;
+	formats: string;
     card_sets: APICardSet[];
     banlist_info?: APICardBanlist;
     card_images: APICardImage[];
@@ -115,6 +117,11 @@ function generateCardStats(card: APICard): string {
 	return stats;
 }
 
+// cr: https://blog.abelotech.com/posts/number-currency-formatting-javascript/
+function formatNumber(num: number): string {
+	return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}
+
 function parseCardInfo(card: APICard): MessageContent {
 	const stats = generateCardStats(card);
 	const outEmbed: MessageContent = {
@@ -122,7 +129,7 @@ function parseCardInfo(card: APICard): MessageContent {
 			color: embed,
 			description: stats,
 			fields: [],
-			footer: { text: card.id },
+			footer: { text: card.id + " Views: " + formatNumber(parseInt(card.views, 10)) + " Addt’l. Formats: " + card.formats.replace(/,/g, ", ") },
 			thumbnail: { url: picsource + card.id + picext },
 			title: card.name,
 			url: dbsource + encodeURIComponent(card.name)

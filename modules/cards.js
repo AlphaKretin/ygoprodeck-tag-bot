@@ -117,6 +117,10 @@ function generateCardStats(card) {
     stats += "\n";
     return stats;
 }
+// cr: https://blog.abelotech.com/posts/number-currency-formatting-javascript/
+function formatNumber(num) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}
 function parseCardInfo(card) {
     var stats = generateCardStats(card);
     var outEmbed = {
@@ -124,7 +128,7 @@ function parseCardInfo(card) {
             color: config_json_1.embed,
             description: stats,
             fields: [],
-            footer: { text: card.id },
+            footer: { text: card.id + " Views: " + formatNumber(parseInt(card.views, 10)) + " Addt’l. Formats: " + card.formats.replace(/,/g, ", ") },
             thumbnail: { url: config_json_1.picsource + card.id + config_json_1.picext },
             title: card.name,
             url: config_json_1.dbsource + encodeURIComponent(card.name)
