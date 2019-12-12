@@ -127,8 +127,16 @@ bot.on("messageCreate", function (msg) {
     }
     var queryReg = /\[([^[]+?)\]/g; // declare anew in-scope to reset index
     var result = queryReg.exec(msg.content);
-    if (result !== null) {
-        cards_js_1.searchCard(result[1], msg).catch(function (e) { return console.error(e); });
+    var results = [];
+    while (result !== null) {
+        results.push(result[1]);
+        result = queryReg.exec(msg.content);
+    }
+    if (results.length > 0) {
+        var max = Math.min(results.length, config_json_1.maxSearch);
+        for (var i = 0; i < max; i++) {
+            cards_js_1.searchCard(results[i], msg).catch(function (e) { return console.error(e); });
+        }
     }
 });
 bot.on("error", function (err) { return console.error(err); });

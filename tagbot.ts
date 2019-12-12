@@ -1,6 +1,6 @@
 import * as Eris from "eris";
 import { token, admins } from "./auth.json";
-import { prefix } from "./config.json";
+import { prefix, maxSearch } from "./config.json";
 import { updateTagMap, fullTagNames, tagMap } from "./modules/tags";
 import { cleanString, messageCapSlice } from "./modules/util";
 import { searchCard, updateCardNames } from "./modules/cards.js";
@@ -58,9 +58,17 @@ bot.on("messageCreate", msg => {
 		}
 	}
 	const queryReg = /\[([^[]+?)\]/g; // declare anew in-scope to reset index
-	const result = queryReg.exec(msg.content);
-	if (result !== null) {
-		searchCard(result[1], msg).catch(e => console.error(e));
+	let result = queryReg.exec(msg.content);
+	const results = [];
+	while (result !== null) {
+		results.push(result[1]);
+		result = queryReg.exec(msg.content);
+	}
+	if (results.length > 0) {
+		const max = Math.min(results.length, maxSearch);
+		for (let i = 0; i < max; i++) {
+			searchCard(results[i], msg).catch(e => console.error(e));
+		}
 	}
 });
 
