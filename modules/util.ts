@@ -23,3 +23,8 @@ export function messageCapSlice(outString: string): string[] {
 	outStrings.push(outString);
 	return outStrings;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function errhand(e: any): void {
+	console.error(e);
+}

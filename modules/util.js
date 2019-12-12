@@ -26,4 +26,9 @@ function messageCapSlice(outString) {
     return outStrings;
 }
 exports.messageCapSlice = messageCapSlice;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function errhand(e) {
+    console.error(e);
+}
+exports.errhand = errhand;
 //# sourceMappingURL=util.js.map
