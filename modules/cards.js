@@ -142,6 +142,15 @@ function parseCardInfo(card) {
                 value: descs[i]
             });
         }
+        var priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
+        var priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
+        var priceEB = "eBay: $" + card.card_prices.ebay_price;
+        var priceAZ = "Amazon: $" + card.card_prices.amazon_price;
+        outEmbed.embed.fields.push({
+            name: "Prices",
+            value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
+            inline: true,
+        });
         if (card.banlist_info) {
             var banlistInfos = [];
             if (card.banlist_info.ban_ocg) {
@@ -159,15 +168,6 @@ function parseCardInfo(card) {
                 inline: true
             });
         }
-        var priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
-        var priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
-        var priceEB = "eBay: $" + card.card_prices.ebay_price;
-        var priceAZ = "Amazon: $" + card.card_prices.amazon_price;
-        outEmbed.embed.fields.push({
-            name: "Prices",
-            value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
-            inline: true,
-        });
     }
     return outEmbed;
 }

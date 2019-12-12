@@ -140,6 +140,18 @@ function parseCardInfo(card: APICard): MessageContent {
 				value: descs[i]
 			});
 		}
+
+		const priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
+		const priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
+		const priceEB = "eBay: $" + card.card_prices.ebay_price;
+		const priceAZ = "Amazon: $" + card.card_prices.amazon_price;
+
+		outEmbed.embed.fields.push({
+			name: "Prices",
+			value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
+			inline: true,
+		});
+
 		if (card.banlist_info) {
 			const banlistInfos = [];
 			if (card.banlist_info.ban_ocg) {
@@ -157,17 +169,6 @@ function parseCardInfo(card: APICard): MessageContent {
 				inline: true
 			});
 		}
-
-		const priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
-		const priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
-		const priceEB = "eBay: $" + card.card_prices.ebay_price;
-		const priceAZ = "Amazon: $" + card.card_prices.amazon_price;
-
-		outEmbed.embed.fields.push({
-			name: "Prices",
-			value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
-			inline: true,
-		});
 	}
 	return outEmbed;
 }
