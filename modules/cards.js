@@ -140,10 +140,10 @@ function parseCardInfo(card) {
                 banlistInfos.push(card.banlist_info.ban_ocg + " (OCG)");
             }
             if (card.banlist_info.ban_tcg) {
-                banlistInfos.push(card.banlist_info.ban_ocg + " (TCG)");
+                banlistInfos.push(card.banlist_info.ban_tcg + " (TCG)");
             }
             if (card.banlist_info.ban_goat) {
-                banlistInfos.push(card.banlist_info.ban_ocg + " (Goat)");
+                banlistInfos.push(card.banlist_info.ban_goat + " (Goat)");
             }
             outEmbed.embed.fields.push({
                 name: "Banlist Info",
