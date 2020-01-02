@@ -74,19 +74,52 @@ bot.on("messageCreate", function (msg) {
         return;
     }
     if (msg.content.startsWith(config_json_1.prefix)) {
-        var command = util_1.cleanString(msg.content);
-        // Update command. Admin-only, updates the list of tags from the source.
-        if (command.startsWith("update") && auth_json_1.admins.includes(msg.author.id)) {
-            msg.channel.createMessage("Updating!").then(function (m) {
-                update().then(function () {
-                    m.edit("Update complete!");
-                }, function (err) {
-                    m.edit("Error!\n```\n" + err + "```");
+        var command_1 = util_1.cleanString(msg.content);
+        // Admin-only commands
+        if (auth_json_1.admins.includes(msg.author.id)) {
+            // Update command. Admin-only, updates the list of tags from the source.
+            if (command_1.startsWith("update")) {
+                msg.channel.createMessage("Updating!").then(function (m) {
+                    update().then(function () {
+                        m.edit("Update complete!");
+                    }, function (err) {
+                        m.edit("Error!\n```\n" + err + "```");
+                    });
                 });
-            });
-            return;
+                return;
+            }
+            if (command_1.startsWith("server")) {
+                var count = bot.guilds.size;
+                var guildList_1 = util_1.messageCapSlice(bot.guilds.map(function (g) { return g.name + " (Users: " + g.memberCount + ")"; }).join("\n"));
+                msg.channel.createMessage("I am in " + count + " servers. Type `.servers list` to see the whole list. This will send you " + guildList_1.length + " Direct Message(s).").then(function () { return __awaiter(void 0, void 0, void 0, function () {
+                    var chan, _i, guildList_2, mes;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                if (!command_1.includes("list")) return [3 /*break*/, 5];
+                                return [4 /*yield*/, msg.author.getDMChannel()];
+                            case 1:
+                                chan = _a.sent();
+                                _i = 0, guildList_2 = guildList_1;
+                                _a.label = 2;
+                            case 2:
+                                if (!(_i < guildList_2.length)) return [3 /*break*/, 5];
+                                mes = guildList_2[_i];
+                                return [4 /*yield*/, chan.createMessage(mes)];
+                            case 3:
+                                _a.sent();
+                                _a.label = 4;
+                            case 4:
+                                _i++;
+                                return [3 /*break*/, 2];
+                            case 5: return [2 /*return*/];
+                        }
+                    });
+                }); }).catch(util_1.errhand);
+            }
         }
-        if (command.startsWith("archives")) {
+        // user commands
+        if (command_1.startsWith("archives")) {
             var out = "This bot can display the following deck tags:\n`" + tags_1.fullTagNames.join("`, `") + "`";
             var outMessages_1 = util_1.messageCapSlice(out);
             if (outMessages_1.length > 1) {
@@ -119,7 +152,7 @@ bot.on("messageCreate", function (msg) {
             }
             return;
         }
-        if (command.startsWith("deck")) {
+        if (command_1.startsWith("deck")) {
             if (msg.attachments.length < 1) {
                 msg.channel.createMessage("Sorry, you must upload a deck file to use this command.").catch(util_1.errhand);
                 return;
@@ -138,7 +171,7 @@ bot.on("messageCreate", function (msg) {
             }).catch(util_1.errhand);
         }
         for (var tag in tags_1.tagMap) {
-            if (command.startsWith(tag)) {
+            if (command_1.startsWith(tag)) {
                 msg.channel.createMessage(tags_1.tagMap[tag]).catch(util_1.errhand);
                 return;
             }

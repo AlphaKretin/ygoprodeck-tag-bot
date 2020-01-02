@@ -23,18 +23,35 @@ bot.on("messageCreate", msg => {
 	}
 	if (msg.content.startsWith(prefix)) {
 		const command = cleanString(msg.content);
+		// Admin-only commands
+		if (admins.includes(msg.author.id)) {
 		// Update command. Admin-only, updates the list of tags from the source.
-		if (command.startsWith("update") && admins.includes(msg.author.id)) {
-			msg.channel.createMessage("Updating!").then(m => {
-				update().then(() => {
-					m.edit("Update complete!");
-				}, err => {
-					m.edit("Error!\n```\n" + err + "```");
+			if (command.startsWith("update")) {
+				msg.channel.createMessage("Updating!").then(m => {
+					update().then(() => {
+						m.edit("Update complete!");
+					}, err => {
+						m.edit("Error!\n```\n" + err + "```");
+					});
 				});
-			});
-			return;
+				return;
+			}
+
+			if (command.startsWith("server")) {
+				const count = bot.guilds.size;
+				const guildList = messageCapSlice(bot.guilds.map(g => g.name + " (Users: " + g.memberCount + ")").join("\n"));
+				msg.channel.createMessage("I am in " + count + " servers. Type `.servers list` to see the whole list. This will send you " + guildList.length + " Direct Message(s).").then(async () => {
+					if (command.includes("list")) {
+						const chan = await msg.author.getDMChannel();
+						for (const mes of guildList) {
+							await chan.createMessage(mes);
+						}
+					}
+				}).catch(errhand);
+			}
 		}
 
+		// user commands
 		if (command.startsWith("archives")) {
 			const out = "This bot can display the following deck tags:\n`" + fullTagNames.join("`, `") + "`";
 			const outMessages = messageCapSlice(out);
