@@ -103,12 +103,34 @@ export async function price(msg: Eris.Message): Promise<void> {
 		title: prices.card,
 		url: dbsource + encodeURIComponent(prices.card)	
 	};
+	const embedFields = [];
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	let length = output.title!.length;
+	let fields: {
+        name: string | undefined;
+        value: string | undefined;
+    }[] = [];
+	const EMBED_TOTAL_CAP = 6000;
 	for (const profile of priceProfiles) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		output.fields!.push({
+		const field = {
 			name: vendor.name + " Prices",
 			value: profile
-		});
+		};
+		const newLength = length + field.name.length + field.value.length;
+		if (newLength > EMBED_TOTAL_CAP) {
+			embedFields.push(fields);
+			fields = [field];
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			length = output.title!.length + field.name.length + field.value.length;
+		} else {
+			fields.push(field);
+			length = newLength;
+		}
 	}
-	await msg.channel.createMessage({ embed: output });
+	embedFields.push(fields);
+	for (const field of embedFields) {
+		output.fields = field;
+		await msg.channel.createMessage({ embed: output });    
+	}
+	
 }

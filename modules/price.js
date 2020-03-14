@@ -84,9 +84,9 @@ var vendors = [
 ];
 function price(msg) {
     return __awaiter(this, void 0, void 0, function () {
-        var terms, vendor, _i, vendors_1, vend, query, fuzzyResult, result, card, url, response, prices, priceProfiles, output, _a, priceProfiles_1, profile;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var terms, vendor, _i, vendors_1, vend, query, fuzzyResult, result, card, url, response, prices, priceProfiles, output, embedFields, length, fields, EMBED_TOTAL_CAP, _a, priceProfiles_1, profile, field, newLength, _b, embedFields_1, field;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     terms = msg.content.toLowerCase().trim().split(/\s+/);
                     for (_i = 0, vendors_1 = vendors; _i < vendors_1.length; _i++) {
@@ -98,21 +98,21 @@ function price(msg) {
                     if (!(vendor === undefined)) return [3 /*break*/, 2];
                     return [4 /*yield*/, msg.channel.createMessage("Please provide the name of a vendor to see their prices! The options are TCGPlayer, Cardmarket, and CoolStuffInc!")];
                 case 1:
-                    _b.sent();
+                    _c.sent();
                     return [2 /*return*/];
                 case 2:
                     query = terms.splice(2).join(" ");
                     if (!(query.length < 1)) return [3 /*break*/, 4];
                     return [4 /*yield*/, msg.channel.createMessage("Please provide the name of a card to see prices for!")];
                 case 3:
-                    _b.sent();
+                    _c.sent();
                     return [2 /*return*/];
                 case 4:
                     fuzzyResult = cards_1.cardFuzzy.search(query);
                     if (!(fuzzyResult.length < 1)) return [3 /*break*/, 6];
                     return [4 /*yield*/, msg.channel.createMessage("Sorry, I couldn't find a card named `" + query + "`")];
                 case 5:
-                    _b.sent();
+                    _c.sent();
                     return [2 /*return*/];
                 case 6:
                     result = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
@@ -120,10 +120,10 @@ function price(msg) {
                     url = config_json_1.priceSource + "?cardone=" + encodeURIComponent(card) + "&vendor=" + vendor.api;
                     return [4 /*yield*/, node_fetch_1.default(url)];
                 case 7:
-                    response = _b.sent();
+                    response = _c.sent();
                     return [4 /*yield*/, response.json()];
                 case 8:
-                    prices = _b.sent();
+                    prices = _c.sent();
                     priceProfiles = messageCapSlice(prices.set_info.map(function (s) {
                         var rarity = s.rarity ? " (" + s.rarity + ")" : (s.rarity_short ? " " + s.rarity_short : "");
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -136,18 +136,43 @@ function price(msg) {
                         title: prices.card,
                         url: config_json_1.dbsource + encodeURIComponent(prices.card)
                     };
+                    embedFields = [];
+                    length = output.title.length;
+                    fields = [];
+                    EMBED_TOTAL_CAP = 6000;
                     for (_a = 0, priceProfiles_1 = priceProfiles; _a < priceProfiles_1.length; _a++) {
                         profile = priceProfiles_1[_a];
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        output.fields.push({
+                        field = {
                             name: vendor.name + " Prices",
                             value: profile
-                        });
+                        };
+                        newLength = length + field.name.length + field.value.length;
+                        if (newLength > EMBED_TOTAL_CAP) {
+                            embedFields.push(fields);
+                            fields = [field];
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            length = output.title.length + field.name.length + field.value.length;
+                        }
+                        else {
+                            fields.push(field);
+                            length = newLength;
+                        }
                     }
-                    return [4 /*yield*/, msg.channel.createMessage({ embed: output })];
+                    embedFields.push(fields);
+                    _b = 0, embedFields_1 = embedFields;
+                    _c.label = 9;
                 case 9:
-                    _b.sent();
-                    return [2 /*return*/];
+                    if (!(_b < embedFields_1.length)) return [3 /*break*/, 12];
+                    field = embedFields_1[_b];
+                    output.fields = field;
+                    return [4 /*yield*/, msg.channel.createMessage({ embed: output })];
+                case 10:
+                    _c.sent();
+                    _c.label = 11;
+                case 11:
+                    _b++;
+                    return [3 /*break*/, 9];
+                case 12: return [2 /*return*/];
             }
         });
     });
