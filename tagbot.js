@@ -50,6 +50,7 @@ var ftp_1 = require("./modules/ftp");
 var tags_1 = require("./modules/tags");
 var util_1 = require("./modules/util");
 var cards_js_1 = require("./modules/cards.js");
+var price_1 = require("./modules/price");
 process.on("unhandledRejection", util_1.errhand);
 var bot = new Eris.Client(auth_json_1.token);
 function update() {
@@ -169,6 +170,9 @@ bot.on("messageCreate", function (msg) {
             ftp_1.uploadDeck(att).then(function (url) {
                 msg.channel.createMessage("See your uploaded deck at <" + url + ">!").catch(util_1.errhand);
             }).catch(util_1.errhand);
+        }
+        if (command_1.startsWith("price")) {
+            price_1.price(msg).catch(util_1.errhand);
         }
         for (var tag in tags_1.tagMap) {
             if (command_1.startsWith(tag)) {

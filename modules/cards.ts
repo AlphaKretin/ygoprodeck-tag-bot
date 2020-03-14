@@ -17,7 +17,7 @@ const fuseOptions: fuse.FuseOptions<APICard> = {
 };
 
 let allCards: APICard[] = [];
-let cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptions);
+export let cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptions);
 
 export async function updateCardNames(): Promise<void> {
 	const rawResponse = await fetch(apisource);

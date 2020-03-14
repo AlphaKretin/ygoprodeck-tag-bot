@@ -8,5 +8,6 @@
     "dbsource": "https://db.ygoprodeck.com/card/?search=",
     "maxSearch": 2,
     "deckSource": "https://ygoprodeck.com/card-database/deck-prices/?u=https://ygoprodeck.com/discord-decks/",
-    "deckMaxSize": 1024
+    "deckMaxSize": 1024,
+    "priceSource": "https://db.ygoprodeck.com/queries/getPrices.php"
 }
