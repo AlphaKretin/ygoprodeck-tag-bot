@@ -1,9 +1,10 @@
 import * as Eris from "eris";
 import { dbsource, embed, priceSource } from "../config.json";
+import { cardFuzzy } from "./cards";
 import fetch from "node-fetch";
 
 interface SetInfo {
-    price: number;
+    price: number | null;
     set: string;
     url: string;
     rarity?: string;
@@ -35,15 +36,66 @@ function messageCapSlice(outString: string, cap = 1024): string[] {
 	return outStrings;
 }
 
+interface Vendor {
+    name: string;
+    api: string;
+    aliases: string[];
+    format: (price: number) => string;
+}
+
+const vendors: Vendor[] = [
+	{
+		name: "TCGPlayer",
+		api: "tcgplayer",
+		aliases: ["tcg"],
+		format: (price: number): string => "$" + price
+	},
+	{
+		name: "Cardmarket",
+		api: "tcgplayer",
+		aliases: ["market"],
+		format: (price: number): string => price + " €"
+	},
+	{
+		name: "CoolStuffInc",
+		api: "tcgplayer",
+		aliases: ["cool", "coolstuff"],
+		format: (price: number): string => "$" + price
+	}
+];
+
 export async function price(msg: Eris.Message): Promise<void> {
-	const card = "Odd-Eyes Pendulum Dragon";
-	const vendor = "coolstuffinc";
-	const url = priceSource + "?cardone=" + encodeURIComponent(card) + "&vendor=" + vendor;
+	const terms = msg.content.toLowerCase().trim().split(/\s+/);
+	let vendor: Vendor | undefined;
+	for (const vend of vendors) {
+		if (vend.name.toLowerCase()==terms[1] || vend.aliases.includes(terms[1])) {
+			vendor = vend;
+		}
+	}
+	if (vendor === undefined) {
+		await msg.channel.createMessage("Please provide the name of a vendor to see their prices! The options are TCGPlayer, Cardmarket, and CoolStuffInc!");
+		return;
+	}
+	const query = terms.splice(2).join(" ");
+	if (query.length < 1) {
+		await msg.channel.createMessage("Please provide the name of a card to see prices for!");
+		return;
+	}
+	const fuzzyResult = cardFuzzy.search(query);
+	if (fuzzyResult.length < 1) {
+		await msg.channel.createMessage("Sorry, I couldn't find a card named `" + query + "`");
+		return;
+	}
+	const result = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
+	const card = result.name;
+	const url = priceSource + "?cardone=" + encodeURIComponent(card) + "&vendor=" + vendor.api;
 	const response = await fetch(url);
 	const prices: APIPrice = await response.json();
 	const priceProfiles = messageCapSlice(prices.set_info.map(s => {
 		const rarity = s.rarity ? ` (${s.rarity})` : (s.rarity_short ? " " + s.rarity_short : "");
-		return `[${s.set}](${s.url})${rarity}: $${s.price.toFixed(2)}`;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const price = s.price !== null ? vendor!.format(s.price) : "No market price";
+		return `[${s.set}](${s.url})${rarity}: ${price}`;
 	}).join("\n"));
 	const output: Eris.EmbedOptions = {
 		color: embed,
@@ -54,7 +106,7 @@ export async function price(msg: Eris.Message): Promise<void> {
 	for (const profile of priceProfiles) {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		output.fields!.push({
-			name: vendor + " Prices",
+			name: vendor.name + " Prices",
 			value: profile
 		});
 	}

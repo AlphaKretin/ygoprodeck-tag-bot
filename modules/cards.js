@@ -55,7 +55,7 @@ var fuseOptions = {
     keys: ["name"]
 };
 var allCards = [];
-var cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
+exports.cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
 function updateCardNames() {
     return __awaiter(this, void 0, void 0, function () {
         var rawResponse;
@@ -67,7 +67,7 @@ function updateCardNames() {
                     return [4 /*yield*/, rawResponse.json()];
                 case 2:
                     allCards = _a.sent();
-                    cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
+                    exports.cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
                     return [2 /*return*/];
             }
         });
@@ -185,7 +185,7 @@ function searchCard(query, msg) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    fuzzyResult = cardFuzzy.search(query);
+                    fuzzyResult = exports.cardFuzzy.search(query);
                     if (!(fuzzyResult.length > 0)) return [3 /*break*/, 2];
                     card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
                     return [4 /*yield*/, msg.channel.createMessage(parseCardInfo(card))];

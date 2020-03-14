@@ -40,6 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var config_json_1 = require("../config.json");
+var cards_1 = require("./cards");
 var node_fetch_1 = __importDefault(require("node-fetch"));
 function messageCapSlice(outString, cap) {
     if (cap === void 0) { cap = 1024; }
@@ -61,24 +62,73 @@ function messageCapSlice(outString, cap) {
     outStrings.push(outString);
     return outStrings;
 }
+var vendors = [
+    {
+        name: "TCGPlayer",
+        api: "tcgplayer",
+        aliases: ["tcg"],
+        format: function (price) { return "$" + price; }
+    },
+    {
+        name: "Cardmarket",
+        api: "tcgplayer",
+        aliases: ["market"],
+        format: function (price) { return price + " €"; }
+    },
+    {
+        name: "CoolStuffInc",
+        api: "tcgplayer",
+        aliases: ["cool", "coolstuff"],
+        format: function (price) { return "$" + price; }
+    }
+];
 function price(msg) {
     return __awaiter(this, void 0, void 0, function () {
-        var card, vendor, url, response, prices, priceProfiles, output, _i, priceProfiles_1, profile;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var terms, vendor, _i, vendors_1, vend, query, fuzzyResult, result, card, url, response, prices, priceProfiles, output, _a, priceProfiles_1, profile;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    card = "Odd-Eyes Pendulum Dragon";
-                    vendor = "coolstuffinc";
-                    url = config_json_1.priceSource + "?cardone=" + encodeURIComponent(card) + "&vendor=" + vendor;
-                    return [4 /*yield*/, node_fetch_1.default(url)];
+                    terms = msg.content.toLowerCase().trim().split(/\s+/);
+                    for (_i = 0, vendors_1 = vendors; _i < vendors_1.length; _i++) {
+                        vend = vendors_1[_i];
+                        if (vend.name.toLowerCase() == terms[1] || vend.aliases.includes(terms[1])) {
+                            vendor = vend;
+                        }
+                    }
+                    if (!(vendor === undefined)) return [3 /*break*/, 2];
+                    return [4 /*yield*/, msg.channel.createMessage("Please provide the name of a vendor to see their prices! The options are TCGPlayer, Cardmarket, and CoolStuffInc!")];
                 case 1:
-                    response = _a.sent();
-                    return [4 /*yield*/, response.json()];
+                    _b.sent();
+                    return [2 /*return*/];
                 case 2:
-                    prices = _a.sent();
+                    query = terms.splice(2).join(" ");
+                    if (!(query.length < 1)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, msg.channel.createMessage("Please provide the name of a card to see prices for!")];
+                case 3:
+                    _b.sent();
+                    return [2 /*return*/];
+                case 4:
+                    fuzzyResult = cards_1.cardFuzzy.search(query);
+                    if (!(fuzzyResult.length < 1)) return [3 /*break*/, 6];
+                    return [4 /*yield*/, msg.channel.createMessage("Sorry, I couldn't find a card named `" + query + "`")];
+                case 5:
+                    _b.sent();
+                    return [2 /*return*/];
+                case 6:
+                    result = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
+                    card = result.name;
+                    url = config_json_1.priceSource + "?cardone=" + encodeURIComponent(card) + "&vendor=" + vendor.api;
+                    return [4 /*yield*/, node_fetch_1.default(url)];
+                case 7:
+                    response = _b.sent();
+                    return [4 /*yield*/, response.json()];
+                case 8:
+                    prices = _b.sent();
                     priceProfiles = messageCapSlice(prices.set_info.map(function (s) {
                         var rarity = s.rarity ? " (" + s.rarity + ")" : (s.rarity_short ? " " + s.rarity_short : "");
-                        return "[" + s.set + "](" + s.url + ")" + rarity + ": $" + s.price.toFixed(2);
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        var price = s.price !== null ? vendor.format(s.price) : "No market price";
+                        return "[" + s.set + "](" + s.url + ")" + rarity + ": " + price;
                     }).join("\n"));
                     output = {
                         color: config_json_1.embed,
@@ -86,17 +136,17 @@ function price(msg) {
                         title: prices.card,
                         url: config_json_1.dbsource + encodeURIComponent(prices.card)
                     };
-                    for (_i = 0, priceProfiles_1 = priceProfiles; _i < priceProfiles_1.length; _i++) {
-                        profile = priceProfiles_1[_i];
+                    for (_a = 0, priceProfiles_1 = priceProfiles; _a < priceProfiles_1.length; _a++) {
+                        profile = priceProfiles_1[_a];
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         output.fields.push({
-                            name: vendor + " Prices",
+                            name: vendor.name + " Prices",
                             value: profile
                         });
                     }
                     return [4 /*yield*/, msg.channel.createMessage({ embed: output })];
-                case 3:
-                    _a.sent();
+                case 9:
+                    _b.sent();
                     return [2 /*return*/];
             }
         });
