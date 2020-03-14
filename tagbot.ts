@@ -5,6 +5,7 @@ import { uploadDeck } from "./modules/ftp";
 import { updateTagMap, fullTagNames, tagMap } from "./modules/tags";
 import { cleanString, messageCapSlice, errhand } from "./modules/util";
 import { searchCard, updateCardNames } from "./modules/cards.js";
+import { price } from "./modules/price";
 
 process.on("unhandledRejection", errhand);
 
@@ -85,6 +86,10 @@ bot.on("messageCreate", msg => {
 			uploadDeck(att).then(url => {
 				msg.channel.createMessage("See your uploaded deck at <" + url + ">!").catch(errhand);
 			}).catch(errhand);
+		}
+
+		if (command.startsWith("price")) {
+			price(msg).catch(errhand);
 		}
 
 		for (const tag in tagMap) {
