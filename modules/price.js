@@ -64,20 +64,20 @@ function messageCapSlice(outString, cap) {
 }
 var vendors = [
     {
-        name: "TCGPlayer",
+        name: "TCGplayer",
         api: "tcgplayer",
         aliases: ["tcg"],
         format: function (price) { return "$" + price; }
     },
     {
         name: "Cardmarket",
-        api: "tcgplayer",
+        api: "cardmarket",
         aliases: ["market"],
-        format: function (price) { return price + " €"; }
+        format: function (price) { return "€" + price; }
     },
     {
         name: "CoolStuffInc",
-        api: "tcgplayer",
+        api: "coolstuffinc",
         aliases: ["cool", "coolstuff"],
         format: function (price) { return "$" + price; }
     }

@@ -174,6 +174,13 @@ bot.on("messageCreate", function (msg) {
         if (command_1.startsWith("price")) {
             price_1.price(msg).catch(util_1.errhand);
         }
+        if (command_1.startsWith("help")) {
+            msg.channel.createMessage("**.archives**: Provides a list of deck categories. May send you multiple direct messages!\n" +
+                "**.deck**: If you upload a `.ydk` file to Discord, this command will give you a link to the YGOProDeck Builder with it already built.\n" +
+                "**.price**: Displays the price of a card from TCGplayer, Cardmarket, or CoolStuffInc. e.g. `.price tcg kuriboh`\n" +
+                "Type the name of a deck category after a `.` to see the archive for that category.").catch(util_1.errhand);
+            return;
+        }
         for (var tag in tags_1.tagMap) {
             if (command_1.startsWith(tag)) {
                 msg.channel.createMessage(tags_1.tagMap[tag]).catch(util_1.errhand);
@@ -199,6 +206,16 @@ bot.on("error", util_1.errhand);
 bot.on("ready", function () {
     console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
     update().then(function () { return console.log("Ready to go!"); });
+    setInterval(function () {
+        var chan = bot.getChannel("211204089361465344");
+        if (chan instanceof Eris.TextChannel) {
+            chan.createMessage("Updating!").then(function (msg) {
+                update().then(function () {
+                    msg.edit("Update complete!").catch(util_1.errhand);
+                }).catch(util_1.errhand);
+            }).catch(util_1.errhand);
+        }
+    }, 1000 * 60 * 60 * 12);
 });
 bot.connect();
 //# sourceMappingURL=tagbot.js.map

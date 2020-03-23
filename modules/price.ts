@@ -45,20 +45,20 @@ interface Vendor {
 
 const vendors: Vendor[] = [
 	{
-		name: "TCGPlayer",
+		name: "TCGplayer",
 		api: "tcgplayer",
 		aliases: ["tcg"],
 		format: (price: number): string => "$" + price
 	},
 	{
 		name: "Cardmarket",
-		api: "tcgplayer",
+		api: "cardmarket",
 		aliases: ["market"],
-		format: (price: number): string => price + " €"
+		format: (price: number): string => "€" + price
 	},
 	{
 		name: "CoolStuffInc",
-		api: "tcgplayer",
+		api: "coolstuffinc",
 		aliases: ["cool", "coolstuff"],
 		format: (price: number): string => "$" + price
 	}
