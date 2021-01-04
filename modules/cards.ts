@@ -138,7 +138,7 @@ function formatNumber(num: number): string {
 	return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 }
 
-function parseCardInfo(card: APICard): MessageContent {
+function parseCardInfo(card: APICard, lang: string): MessageContent {
 	const stats = generateCardStats(card);
 	let footer = `${card.id} Views: ${formatNumber(card.misc_info[0].views)}`;
 	if (card.misc_info[0].formats) {
@@ -152,7 +152,7 @@ function parseCardInfo(card: APICard): MessageContent {
 			footer: { text: footer },
 			thumbnail: { url: picsource + card.id + picext },
 			title: card.name,
-			url: dbsource + encodeURIComponent(card.name)
+			url: dbsource + encodeURIComponent(card.name) + (lang === "en" ? "" : "&language=" + lang)
 		}
 	};
 	if (outEmbed.embed && outEmbed.embed.fields) {
@@ -205,7 +205,7 @@ export async function searchCard(query: string, msg: Message, lang?: string): Pr
 	const fuzzyResult = cardFuzzy[lang].search(query);
 	if (fuzzyResult.length > 0) {
 		const card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
-		await msg.channel.createMessage(parseCardInfo(card));
+		await msg.channel.createMessage(parseCardInfo(card, lang));
 		return;
 	}
 	await msg.addReaction("❌");

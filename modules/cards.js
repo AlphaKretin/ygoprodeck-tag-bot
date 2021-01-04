@@ -141,7 +141,7 @@ function generateCardStats(card) {
 function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 }
-function parseCardInfo(card) {
+function parseCardInfo(card, lang) {
     var stats = generateCardStats(card);
     var footer = card.id + " Views: " + formatNumber(card.misc_info[0].views);
     if (card.misc_info[0].formats) {
@@ -155,7 +155,7 @@ function parseCardInfo(card) {
             footer: { text: footer },
             thumbnail: { url: config_json_1.picsource + card.id + config_json_1.picext },
             title: card.name,
-            url: config_json_1.dbsource + encodeURIComponent(card.name)
+            url: config_json_1.dbsource + encodeURIComponent(card.name) + (lang === "en" ? "" : "&language=" + lang)
         }
     };
     if (outEmbed.embed && outEmbed.embed.fields) {
@@ -209,7 +209,7 @@ function searchCard(query, msg, lang) {
                     fuzzyResult = exports.cardFuzzy[lang].search(query);
                     if (!(fuzzyResult.length > 0)) return [3 /*break*/, 2];
                     card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
-                    return [4 /*yield*/, msg.channel.createMessage(parseCardInfo(card))];
+                    return [4 /*yield*/, msg.channel.createMessage(parseCardInfo(card, lang))];
                 case 1:
                     _a.sent();
                     return [2 /*return*/];
