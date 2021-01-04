@@ -83,7 +83,7 @@ export async function price(msg: Eris.Message): Promise<void> {
 		await msg.channel.createMessage("Please provide the name of a card to see prices for!");
 		return;
 	}
-	const fuzzyResult = cardFuzzy.search(query);
+	const fuzzyResult = cardFuzzy.en.search(query);
 	if (fuzzyResult.length < 1) {
 		await msg.channel.createMessage(`Sorry, I couldn't find a card named \`${query}\``);
 		return;

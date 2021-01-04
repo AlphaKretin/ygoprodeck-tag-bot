@@ -1,6 +1,6 @@
 import * as Eris from "eris";
 import { token, admins } from "./auth.json";
-import { prefix, maxSearch, deckMaxSize } from "./config.json";
+import { prefix, maxSearch, deckMaxSize, langs } from "./config.json";
 import { uploadDeck } from "./modules/ftp";
 import { updateTagMap, fullTagNames, tagMap } from "./modules/tags";
 import { cleanString, messageCapSlice, errhand } from "./modules/util";
@@ -17,8 +17,6 @@ async function update(): Promise<void> {
 	proms.push(updateCardNames().then(() => console.log("Card names updated")));
 	await Promise.all(proms);
 }
-
-const langs = ["fr", "de", "pt", "it"];
 
 bot.on("messageCreate", msg => {
 	if (msg.author.bot) {

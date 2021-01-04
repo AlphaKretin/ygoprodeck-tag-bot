@@ -2,6 +2,7 @@
     "prefix": ".",
     "source": "https://ygoprodeck.com/queries/wp_list_archives.php",
     "apisource": "https://db.ygoprodeck.com/api/v7/cardinfo.php?misc=yes",
+    "langs": ["fr", "de", "pt", "it"],
     "embed": 11688218,
     "picsource": "https://storage.googleapis.com/ygoprodeck.com/pics_artgame/",
     "picext": ".jpg",

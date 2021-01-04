@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import fuse from "fuse.js";
 import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
-import { apisource, embed, picsource, picext, dbsource } from "../config.json";
+import { apisource, embed, picsource, picext, dbsource, langs } from "../config.json";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const emotes: { [key: string]: string } = require("../emotes.json"); // required so as to not infer type
 
@@ -16,13 +16,18 @@ const fuseOptions: fuse.FuseOptions<APICard> = {
 	keys: ["name"]
 };
 
-let allCards: APICard[] = [];
-export let cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptions);
+let allCards: { [lang: string]: APICard[] } = {};
+export let cardFuzzy: { [lang: string]: fuse<APICard, typeof fuseOptions> } = {};
 
 export async function updateCardNames(): Promise<void> {
 	const rawResponse = await fetch(apisource);
-	allCards = (await rawResponse.json()).data;
-	cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptions);
+	allCards.en = (await rawResponse.json()).data;
+	cardFuzzy.en = new fuse<APICard, typeof fuseOptions>(allCards.en, fuseOptions);
+	for (const lang of langs) {
+		const langResponse = await fetch(apisource + "&language=" + lang);
+		allCards[lang] = (await langResponse.json()).data;
+		cardFuzzy[lang] = new fuse<APICard, typeof fuseOptions>(allCards[lang], fuseOptions);
+	}
 }
 
 interface APICardSet {
@@ -197,7 +202,8 @@ function parseCardInfo(card: APICard): MessageContent {
 }
 
 export async function searchCard(query: string, msg: Message, lang?: string): Promise<void> {
-	const fuzzyResult = cardFuzzy.search(query);
+	lang = lang || "en";
+	const fuzzyResult = cardFuzzy[lang].search(query);
 	if (fuzzyResult.length > 0) {
 		const card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
 		await msg.channel.createMessage(parseCardInfo(card));
