@@ -62,7 +62,7 @@ interface APICardMisc {
 	viewsweek: number;
 	upvotes: number;
 	downvotes: number;
-	formats: string[];
+	formats?: string[];
 	treated_as?: string;
 	tcg_date: string;
 	ocg_date: string;
@@ -82,7 +82,6 @@ interface APICard {
 	attribute?: string;
 	scale?: string;
 	archetype?: string;
-	formats?: string;
 	card_sets: APICardSet[];
 	banlist_info?: APICardBanlist;
 	card_images: APICardImage[];
@@ -142,8 +141,8 @@ function formatNumber(num: number): string {
 function parseCardInfo(card: APICard): MessageContent {
 	const stats = generateCardStats(card);
 	let footer = `${card.id} Views: ${formatNumber(card.misc_info[0].views)}`;
-	if (card.formats) {
-		footer += ` Addt’l. Formats: ${card.formats.replace(/,/g, ", ")}`;
+	if (card.misc_info[0].formats) {
+		footer += ` Formats: ${card.misc_info[0].formats.join(", ")}`;
 	}
 	const outEmbed: MessageContent = {
 		embed: {

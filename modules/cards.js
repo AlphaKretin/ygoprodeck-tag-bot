@@ -144,8 +144,8 @@ function formatNumber(num) {
 function parseCardInfo(card) {
     var stats = generateCardStats(card);
     var footer = card.id + " Views: " + formatNumber(card.misc_info[0].views);
-    if (card.formats) {
-        footer += " Addt\u2019l. Formats: " + card.formats.replace(/,/g, ", ");
+    if (card.misc_info[0].formats) {
+        footer += " Formats: " + card.misc_info[0].formats.join(", ");
     }
     var outEmbed = {
         embed: {
