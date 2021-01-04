@@ -139,7 +139,9 @@ bot.on("messageCreate", msg => {
 	if (results.length > 0) {
 		const max = Math.min(results.length, maxSearch);
 		for (let i = 0; i < max; i++) {
-			searchCard(results[i], msg).catch(errhand);
+			if (results[i].length > 1 || results[i] === "7") {
+				searchCard(results[i], msg).catch(errhand);
+			}
 		}
 	}
 });
