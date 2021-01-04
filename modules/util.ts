@@ -24,7 +24,6 @@ export function messageCapSlice(outString: string): string[] {
 	return outStrings;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function errhand(e: any): void {
+export function errhand(e: unknown): void {
 	console.error(e);
 }

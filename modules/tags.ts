@@ -2,7 +2,7 @@ import { source } from "../config.json";
 import { cleanString } from "./util";
 import fetch from "node-fetch";
 
-export let tagMap: {[tag: string]: string} = {};
+export let tagMap: { [tag: string]: string } = {};
 export let fullTagNames: string[] = [];
 
 export async function updateTagMap(): Promise<void> {

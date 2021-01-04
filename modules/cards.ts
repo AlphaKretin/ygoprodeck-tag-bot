@@ -4,7 +4,7 @@ import { Message, MessageContent } from "eris";
 import { messageCapSlice } from "./util";
 import { apisource, embed, picsource, picext, dbsource } from "../config.json";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const emotes: {[key: string]:  string} = require("../emotes.json"); // required so as to not infer type
+const emotes: { [key: string]: string } = require("../emotes.json"); // required so as to not infer type
 
 const fuseOptions: fuse.FuseOptions<APICard> = {
 	shouldSort: true,
@@ -26,68 +26,68 @@ export async function updateCardNames(): Promise<void> {
 }
 
 interface APICardSet {
-    set_name: string;
-    set_code: string;
-    set_rarity: string;
-    set_price: string;
+	set_name: string;
+	set_code: string;
+	set_rarity: string;
+	set_price: string;
 }
 
 interface APICardBanlist {
-    ban_tcg?: string;
-    ban_ocg?: string;
-    ban_goat?: string;
+	ban_tcg?: string;
+	ban_ocg?: string;
+	ban_goat?: string;
 }
 
 interface APICardImage {
-    id: string;
-    image_url: string;
-    image_url_small: string;  
+	id: string;
+	image_url: string;
+	image_url_small: string;
 }
 
 interface APICardPrices {
-    cardmarket_price: string;
-    tcgplayer_price: string;
-    ebay_price: string;
-    amazon_price: string;
+	cardmarket_price: string;
+	tcgplayer_price: string;
+	ebay_price: string;
+	amazon_price: string;
 }
 
 interface APICard {
-    id: string;
-    name: string;
-    type: string;
-    desc: string;
-    atk?: string;
-    def?: string;
-    level?: string;
-    linkval?: string;
-    linkmarkers?: string[];
-    race: string;
-    attribute?: string;
-    scale?: string;
+	id: string;
+	name: string;
+	type: string;
+	desc: string;
+	atk?: string;
+	def?: string;
+	level?: string;
+	linkval?: string;
+	linkmarkers?: string[];
+	race: string;
+	attribute?: string;
+	scale?: string;
 	archetype?: string;
 	views: string;
 	formats?: string;
-    card_sets: APICardSet[];
-    banlist_info?: APICardBanlist;
-    card_images: APICardImage[];
-    card_prices: APICardPrices;
+	card_sets: APICardSet[];
+	banlist_info?: APICardBanlist;
+	card_images: APICardImage[];
+	card_prices: APICardPrices;
 }
 
 function generateCardStats(card: APICard): string {
 	let stats = "";
 	if (card.archetype) {
-		stats += "**Archetype**: " + card.archetype;
+		stats += `**Archetype**: ${card.archetype}`;
 	}
 	stats += "\n";
-	const type = "**Type**: " + card.type + " **Race**: " + card.race; 
+	const type = `**Type**: ${card.type} **Race**: ${card.race}`;
 	stats += type;
 	if (card.race in emotes) {
-		stats += " " + emotes[card.race];
+		stats += ` ${emotes[card.race]}`;
 	}
 	if (card.attribute) {
-		stats += " **Attribute**: " + card.attribute;
+		stats += ` **Attribute**: ${card.attribute}`;
 		if (card.attribute in emotes) {
-			stats += " " + emotes[card.attribute];
+			stats += ` ${emotes[card.attribute]}`;
 		}
 	}
 	stats += "\n";
@@ -96,22 +96,22 @@ function generateCardStats(card: APICard): string {
 		if (card.type.toLowerCase().includes("xyz")) {
 			levelName = "Rank";
 		}
-		stats += "**" + levelName + "**: " + card.level;
+		stats += `**${levelName}**: ${card.level}`;
 	}
 	if (card.linkval) {
-		stats += "**Link Rating**: " + card.linkval;
+		stats += `**Link Rating**: ${card.linkval}`;
 	}
 	if (card.atk) {
-		stats += " **ATK**: " + card.atk;
+		stats += ` **ATK**: ${card.atk}`;
 	}
 	if (card.def) {
-		stats += " **DEF**: " + card.def;
+		stats += ` **DEF**: ${card.def}`;
 	}
 	if (card.linkmarkers) {
-		stats += " **Link Markers**: " + card.linkmarkers.join(", ");
+		stats += ` **Link Markers**: ${card.linkmarkers.join(", ")}`;
 	}
 	if (card.scale) {
-		stats += " **Pendulum Scale**: " + card.scale;
+		stats += ` **Pendulum Scale**: ${card.scale}`;
 	}
 	stats += "\n";
 	return stats;
@@ -124,9 +124,9 @@ function formatNumber(num: number): string {
 
 function parseCardInfo(card: APICard): MessageContent {
 	const stats = generateCardStats(card);
-	let footer = card.id + " Views: " + formatNumber(parseInt(card.views, 10));
+	let footer = `${card.id} Views: ${formatNumber(parseInt(card.views, 10))}`;
 	if (card.formats) {
-		footer += " Addt’l. Formats: " + card.formats.replace(/,/g, ", ");
+		footer += ` Addt’l. Formats: ${card.formats.replace(/,/g, ", ")}`;
 	}
 	const outEmbed: MessageContent = {
 		embed: {
@@ -152,27 +152,27 @@ function parseCardInfo(card: APICard): MessageContent {
 			});
 		}
 
-		const priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
-		const priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
-		const priceEB = "eBay: $" + card.card_prices.ebay_price;
-		const priceAZ = "Amazon: $" + card.card_prices.amazon_price;
+		const priceCM = `Cardmarket: €${card.card_prices.cardmarket_price}`;
+		const priceTP = `TCGPlayer: $${card.card_prices.tcgplayer_price}`;
+		const priceEB = `eBay: $${card.card_prices.ebay_price}`;
+		const priceAZ = `Amazon: $${card.card_prices.amazon_price}`;
 
 		outEmbed.embed.fields.push({
 			name: "Prices",
-			value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
-			inline: true,
+			value: `${priceCM} | ${priceTP}\n${priceEB} | ${priceAZ}`,
+			inline: true
 		});
 
 		if (card.banlist_info) {
 			const banlistInfos = [];
 			if (card.banlist_info.ban_ocg) {
-				banlistInfos.push(card.banlist_info.ban_ocg + " (OCG)");
+				banlistInfos.push(`${card.banlist_info.ban_ocg} (OCG)`);
 			}
 			if (card.banlist_info.ban_tcg) {
-				banlistInfos.push(card.banlist_info.ban_tcg + " (TCG)");
+				banlistInfos.push(`${card.banlist_info.ban_tcg} (TCG)`);
 			}
 			if (card.banlist_info.ban_goat) {
-				banlistInfos.push(card.banlist_info.ban_goat + " (Goat)");
+				banlistInfos.push(`${card.banlist_info.ban_goat} (Goat)`);
 			}
 			outEmbed.embed.fields.push({
 				name: "Banlist Info",
