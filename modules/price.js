@@ -39,6 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.price = void 0;
 var config_json_1 = require("../config.json");
 var cards_1 = require("./cards");
 var node_fetch_1 = __importDefault(require("node-fetch"));
@@ -73,7 +74,7 @@ var vendors = [
         name: "Cardmarket",
         api: "cardmarket",
         aliases: ["market"],
-        format: function (price) { return "€" + price; }
+        format: function (price) { return "\u20AC" + price; }
     },
     {
         name: "CoolStuffInc",
@@ -108,7 +109,7 @@ function price(msg) {
                     _c.sent();
                     return [2 /*return*/];
                 case 4:
-                    fuzzyResult = cards_1.cardFuzzy.search(query);
+                    fuzzyResult = cards_1.cardFuzzy.en.search(query);
                     if (!(fuzzyResult.length < 1)) return [3 /*break*/, 6];
                     return [4 /*yield*/, msg.channel.createMessage("Sorry, I couldn't find a card named `" + query + "`")];
                 case 5:
@@ -124,12 +125,14 @@ function price(msg) {
                     return [4 /*yield*/, response.json()];
                 case 8:
                     prices = _c.sent();
-                    priceProfiles = messageCapSlice(prices.set_info.map(function (s) {
-                        var rarity = s.rarity ? " (" + s.rarity + ")" : (s.rarity_short ? " " + s.rarity_short : "");
+                    priceProfiles = messageCapSlice(prices.set_info
+                        .map(function (s) {
+                        var rarity = s.rarity ? " (" + s.rarity + ")" : s.rarity_short ? " " + s.rarity_short : "";
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         var price = s.price !== null ? vendor.format(s.price) : "No market price";
                         return "[" + s.set + "](" + s.url + ")" + rarity + ": " + price;
-                    }).join("\n"));
+                    })
+                        .join("\n"));
                     output = {
                         color: config_json_1.embed,
                         fields: [],

@@ -39,6 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.searchCard = exports.updateCardNames = exports.cardFuzzy = void 0;
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var fuse_js_1 = __importDefault(require("fuse.js"));
 var util_1 = require("./util");
@@ -54,21 +55,40 @@ var fuseOptions = {
     minMatchCharLength: 1,
     keys: ["name"]
 };
-var allCards = [];
-exports.cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
+var allCards = {};
+exports.cardFuzzy = {};
 function updateCardNames() {
     return __awaiter(this, void 0, void 0, function () {
-        var rawResponse;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var rawResponse, _a, _i, langs_1, lang, langResponse, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0: return [4 /*yield*/, node_fetch_1.default(config_json_1.apisource)];
                 case 1:
-                    rawResponse = _a.sent();
+                    rawResponse = _d.sent();
+                    _a = allCards;
                     return [4 /*yield*/, rawResponse.json()];
                 case 2:
-                    allCards = _a.sent();
-                    exports.cardFuzzy = new fuse_js_1.default(allCards, fuseOptions);
-                    return [2 /*return*/];
+                    _a.en = (_d.sent()).data;
+                    exports.cardFuzzy.en = new fuse_js_1.default(allCards.en, fuseOptions);
+                    _i = 0, langs_1 = config_json_1.langs;
+                    _d.label = 3;
+                case 3:
+                    if (!(_i < langs_1.length)) return [3 /*break*/, 7];
+                    lang = langs_1[_i];
+                    return [4 /*yield*/, node_fetch_1.default(config_json_1.apisource + "&language=" + lang)];
+                case 4:
+                    langResponse = _d.sent();
+                    _b = allCards;
+                    _c = lang;
+                    return [4 /*yield*/, langResponse.json()];
+                case 5:
+                    _b[_c] = (_d.sent()).data;
+                    exports.cardFuzzy[lang] = new fuse_js_1.default(allCards[lang], fuseOptions);
+                    _d.label = 6;
+                case 6:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 7: return [2 /*return*/];
             }
         });
     });
@@ -123,9 +143,9 @@ function formatNumber(num) {
 }
 function parseCardInfo(card) {
     var stats = generateCardStats(card);
-    var footer = card.id + " Views: " + formatNumber(parseInt(card.views, 10));
+    var footer = card.id + " Views: " + formatNumber(card.misc_info[0].views);
     if (card.formats) {
-        footer += " Addt’l. Formats: " + card.formats.replace(/,/g, ", ");
+        footer += " Addt\u2019l. Formats: " + card.formats.replace(/,/g, ", ");
     }
     var outEmbed = {
         embed: {
@@ -150,14 +170,14 @@ function parseCardInfo(card) {
                 value: descs[i]
             });
         }
-        var priceCM = "Cardmarket: €" + card.card_prices.cardmarket_price;
-        var priceTP = "TCGPlayer: $" + card.card_prices.tcgplayer_price;
-        var priceEB = "eBay: $" + card.card_prices.ebay_price;
-        var priceAZ = "Amazon: $" + card.card_prices.amazon_price;
+        var priceCM = "Cardmarket: \u20AC" + card.card_prices[0].cardmarket_price;
+        var priceTP = "TCGPlayer: $" + card.card_prices[0].tcgplayer_price;
+        var priceEB = "eBay: $" + card.card_prices[0].ebay_price;
+        var priceAZ = "Amazon: $" + card.card_prices[0].amazon_price;
         outEmbed.embed.fields.push({
             name: "Prices",
             value: priceCM + " | " + priceTP + "\n" + priceEB + " | " + priceAZ,
-            inline: true,
+            inline: true
         });
         if (card.banlist_info) {
             var banlistInfos = [];
@@ -179,13 +199,14 @@ function parseCardInfo(card) {
     }
     return outEmbed;
 }
-function searchCard(query, msg) {
+function searchCard(query, msg, lang) {
     return __awaiter(this, void 0, void 0, function () {
         var fuzzyResult, card;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    fuzzyResult = exports.cardFuzzy.search(query);
+                    lang = lang || "en";
+                    fuzzyResult = exports.cardFuzzy[lang].search(query);
                     if (!(fuzzyResult.length > 0)) return [3 /*break*/, 2];
                     card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;
                     return [4 /*yield*/, msg.channel.createMessage(parseCardInfo(card))];

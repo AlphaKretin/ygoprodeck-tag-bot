@@ -39,6 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.uploadDeck = void 0;
 var promise_ftp_1 = __importDefault(require("promise-ftp"));
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var auth_json_1 = require("../auth.json");

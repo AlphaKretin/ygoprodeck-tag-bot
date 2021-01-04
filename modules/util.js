@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.errhand = exports.messageCapSlice = exports.cleanString = void 0;
 // strip non alpha-numeric characters so that someone searching for "Battlin' Boxer" and "battlingboxer" gets the same result
 function cleanString(s) {
     return s.toLowerCase().replace(/[\W_]+/g, "");
@@ -26,7 +27,6 @@ function messageCapSlice(outString) {
     return outStrings;
 }
 exports.messageCapSlice = messageCapSlice;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function errhand(e) {
     console.error(e);
 }

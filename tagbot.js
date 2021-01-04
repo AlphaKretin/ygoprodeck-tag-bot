@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,13 +53,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Eris = __importStar(require("eris"));
@@ -92,7 +104,9 @@ bot.on("messageCreate", function (msg) {
             if (command_1.startsWith("server")) {
                 var count = bot.guilds.size;
                 var guildList_1 = util_1.messageCapSlice(bot.guilds.map(function (g) { return g.name + " (Users: " + g.memberCount + ")"; }).join("\n"));
-                msg.channel.createMessage("I am in " + count + " servers. Type `.servers list` to see the whole list. This will send you " + guildList_1.length + " Direct Message(s).").then(function () { return __awaiter(void 0, void 0, void 0, function () {
+                msg.channel
+                    .createMessage("I am in " + count + " servers. Type `.servers list` to see the whole list. This will send you " + guildList_1.length + " Direct Message(s).")
+                    .then(function () { return __awaiter(void 0, void 0, void 0, function () {
                     var chan, _i, guildList_2, mes;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
@@ -116,7 +130,8 @@ bot.on("messageCreate", function (msg) {
                             case 5: return [2 /*return*/];
                         }
                     });
-                }); }).catch(util_1.errhand);
+                }); })
+                    .catch(util_1.errhand);
             }
         }
         // user commands
@@ -124,7 +139,9 @@ bot.on("messageCreate", function (msg) {
             var out = "This bot can display the following deck tags:\n`" + tags_1.fullTagNames.join("`, `") + "`";
             var outMessages_1 = util_1.messageCapSlice(out);
             if (outMessages_1.length > 1) {
-                msg.channel.createMessage("This list of archives is very long! It takes multiple messages, so I'll send it to you in a DM").then(function () { return __awaiter(void 0, void 0, void 0, function () {
+                msg.channel
+                    .createMessage("This list of archives is very long! It takes multiple messages, so I'll send it to you in a DM")
+                    .then(function () { return __awaiter(void 0, void 0, void 0, function () {
                     var chan, _i, outMessages_2, mes;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
@@ -164,21 +181,27 @@ bot.on("messageCreate", function (msg) {
                 return;
             }
             if (att.size > config_json_1.deckMaxSize) {
-                msg.channel.createMessage("Sorry, deck files are usually very small, so for security reasons, large files are not considered valid deck files.").catch(util_1.errhand);
+                msg.channel
+                    .createMessage("Sorry, deck files are usually very small, so for security reasons, large files are not considered valid deck files.")
+                    .catch(util_1.errhand);
                 return;
             }
-            ftp_1.uploadDeck(att).then(function (url) {
+            ftp_1.uploadDeck(att)
+                .then(function (url) {
                 msg.channel.createMessage("See your uploaded deck at <" + url + ">!").catch(util_1.errhand);
-            }).catch(util_1.errhand);
+            })
+                .catch(util_1.errhand);
         }
         if (command_1.startsWith("price")) {
             price_1.price(msg).catch(util_1.errhand);
         }
         if (command_1.startsWith("help")) {
-            msg.channel.createMessage("**.archives**: Provides a list of deck categories. May send you multiple direct messages!\n" +
+            msg.channel
+                .createMessage("**.archives**: Provides a list of deck categories. May send you multiple direct messages!\n" +
                 "**.deck**: If you upload a `.ydk` file to Discord, this command will give you a link to the YGOProDeck Builder with it already built.\n" +
                 "**.price**: Displays the price of a card from TCGplayer, Cardmarket, or CoolStuffInc. e.g. `.price tcg kuriboh`\n" +
-                "Type the name of a deck category after a `.` to see the archive for that category.").catch(util_1.errhand);
+                "Type the name of a deck category after a `.` to see the archive for that category.")
+                .catch(util_1.errhand);
             return;
         }
         for (var tag in tags_1.tagMap) {
@@ -198,7 +221,17 @@ bot.on("messageCreate", function (msg) {
     if (results.length > 0) {
         var max = Math.min(results.length, config_json_1.maxSearch);
         for (var i = 0; i < max; i++) {
-            cards_js_1.searchCard(results[i], msg).catch(util_1.errhand);
+            if (results[i].length > 1 || results[i] === "7") {
+                var terms = results[i].split(",");
+                var lang = terms.pop();
+                if (lang && config_json_1.langs.includes(lang)) {
+                    var result_1 = terms.join(",");
+                    cards_js_1.searchCard(result_1, msg, lang);
+                }
+                else {
+                    cards_js_1.searchCard(results[i], msg).catch(util_1.errhand);
+                }
+            }
         }
     }
 });
@@ -209,11 +242,16 @@ bot.on("ready", function () {
     setInterval(function () {
         var chan = bot.getChannel("211204089361465344");
         if (chan instanceof Eris.TextChannel) {
-            chan.createMessage("Updating!").then(function (msg) {
-                update().then(function () {
+            chan
+                .createMessage("Updating!")
+                .then(function (msg) {
+                update()
+                    .then(function () {
                     msg.edit("Update complete!").catch(util_1.errhand);
-                }).catch(util_1.errhand);
-            }).catch(util_1.errhand);
+                })
+                    .catch(util_1.errhand);
+            })
+                .catch(util_1.errhand);
         }
     }, 1000 * 60 * 60 * 12);
 });
