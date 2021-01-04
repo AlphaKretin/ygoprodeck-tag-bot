@@ -184,7 +184,7 @@ function parseCardInfo(card: APICard): MessageContent {
 	return outEmbed;
 }
 
-export async function searchCard(query: string, msg: Message): Promise<void> {
+export async function searchCard(query: string, msg: Message, lang?: string): Promise<void> {
 	const fuzzyResult = cardFuzzy.search(query);
 	if (fuzzyResult.length > 0) {
 		const card = "name" in fuzzyResult[0] ? fuzzyResult[0] : fuzzyResult[0].item;

@@ -18,6 +18,8 @@ async function update(): Promise<void> {
 	await Promise.all(proms);
 }
 
+const langs = ["fr", "de", "pt", "it"];
+
 bot.on("messageCreate", msg => {
 	if (msg.author.bot) {
 		return;
@@ -140,7 +142,14 @@ bot.on("messageCreate", msg => {
 		const max = Math.min(results.length, maxSearch);
 		for (let i = 0; i < max; i++) {
 			if (results[i].length > 1 || results[i] === "7") {
-				searchCard(results[i], msg).catch(errhand);
+				const terms = results[i].split(",");
+				const lang = terms.pop();
+				if (lang && langs.includes(lang)) {
+					const result = terms.join(",");
+					searchCard(result, msg, lang);
+				} else {
+					searchCard(results[i], msg).catch(errhand);
+				}
 			}
 		}
 	}
