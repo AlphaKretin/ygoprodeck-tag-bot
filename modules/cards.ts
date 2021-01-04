@@ -21,7 +21,7 @@ export let cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptio
 
 export async function updateCardNames(): Promise<void> {
 	const rawResponse = await fetch(apisource);
-	allCards = await rawResponse.json();
+	allCards = (await rawResponse.json()).data;
 	cardFuzzy = new fuse<APICard, typeof fuseOptions>(allCards, fuseOptions);
 }
 
@@ -51,6 +51,18 @@ interface APICardPrices {
 	amazon_price: string;
 }
 
+interface APICardMisc {
+	beta_name?: string;
+	views: number;
+	viewsweek: number;
+	upvotes: number;
+	downvotes: number;
+	formats: string[];
+	treated_as?: string;
+	tcg_date: string;
+	ocg_date: string;
+}
+
 interface APICard {
 	id: string;
 	name: string;
@@ -65,12 +77,12 @@ interface APICard {
 	attribute?: string;
 	scale?: string;
 	archetype?: string;
-	views: string;
 	formats?: string;
 	card_sets: APICardSet[];
 	banlist_info?: APICardBanlist;
 	card_images: APICardImage[];
-	card_prices: APICardPrices;
+	card_prices: [APICardPrices];
+	misc_info: [APICardMisc];
 }
 
 function generateCardStats(card: APICard): string {
@@ -124,7 +136,7 @@ function formatNumber(num: number): string {
 
 function parseCardInfo(card: APICard): MessageContent {
 	const stats = generateCardStats(card);
-	let footer = `${card.id} Views: ${formatNumber(parseInt(card.views, 10))}`;
+	let footer = `${card.id} Views: ${formatNumber(card.misc_info[0].views)}`;
 	if (card.formats) {
 		footer += ` Addt’l. Formats: ${card.formats.replace(/,/g, ", ")}`;
 	}
@@ -152,10 +164,10 @@ function parseCardInfo(card: APICard): MessageContent {
 			});
 		}
 
-		const priceCM = `Cardmarket: €${card.card_prices.cardmarket_price}`;
-		const priceTP = `TCGPlayer: $${card.card_prices.tcgplayer_price}`;
-		const priceEB = `eBay: $${card.card_prices.ebay_price}`;
-		const priceAZ = `Amazon: $${card.card_prices.amazon_price}`;
+		const priceCM = `Cardmarket: €${card.card_prices[0].cardmarket_price}`;
+		const priceTP = `TCGPlayer: $${card.card_prices[0].tcgplayer_price}`;
+		const priceEB = `eBay: $${card.card_prices[0].ebay_price}`;
+		const priceAZ = `Amazon: $${card.card_prices[0].amazon_price}`;
 
 		outEmbed.embed.fields.push({
 			name: "Prices",
