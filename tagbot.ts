@@ -155,6 +155,8 @@ bot.on("messageCreate", msg => {
 
 bot.on("error", errhand);
 
+bot.on("warn", errhand);
+
 bot.on("ready", () => {
 	console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
 	update().then(() => console.log("Ready to go!"));

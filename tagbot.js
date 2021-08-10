@@ -236,6 +236,7 @@ bot.on("messageCreate", function (msg) {
     }
 });
 bot.on("error", util_1.errhand);
+bot.on("warn", util_1.errhand);
 bot.on("ready", function () {
     console.log("Logged in as %s - %s", bot.user.username, bot.user.id);
     update().then(function () { return console.log("Ready to go!"); });
