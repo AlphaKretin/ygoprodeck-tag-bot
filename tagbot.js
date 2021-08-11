@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -55,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Eris = __importStar(require("eris"));
+var eris_1 = require("eris");
 var auth_json_1 = require("./auth.json");
 var config_json_1 = require("./config.json");
 var ftp_1 = require("./modules/ftp");
@@ -64,7 +45,7 @@ var util_1 = require("./modules/util");
 var cards_js_1 = require("./modules/cards.js");
 var price_1 = require("./modules/price");
 process.on("unhandledRejection", util_1.errhand);
-var bot = new Eris.Client(auth_json_1.token);
+var bot = new eris_1.Client(auth_json_1.token, { maxShards: "auto" });
 function update() {
     return __awaiter(this, void 0, void 0, function () {
         var proms;
@@ -82,7 +63,8 @@ function update() {
         });
     });
 }
-bot.on("messageCreate", function (msg) {
+bot.on("messageCreate", function (m) {
+    var msg = m; // assert channel is in cache as code previously assumed
     if (msg.author.bot) {
         return;
     }
@@ -242,7 +224,7 @@ bot.on("ready", function () {
     update().then(function () { return console.log("Ready to go!"); });
     setInterval(function () {
         var chan = bot.getChannel("211204089361465344");
-        if (chan instanceof Eris.TextChannel) {
+        if (chan instanceof eris_1.TextChannel) {
             chan
                 .createMessage("Updating!")
                 .then(function (msg) {
