@@ -1,4 +1,4 @@
-import * as Eris from "eris";
+import { Client, TextChannel, Message } from "eris";
 import { token, admins } from "./auth.json";
 import { prefix, maxSearch, deckMaxSize, langs } from "./config.json";
 import { uploadDeck } from "./modules/ftp";
@@ -9,7 +9,7 @@ import { price } from "./modules/price";
 
 process.on("unhandledRejection", errhand);
 
-const bot = new Eris.Client(token);
+const bot = new Client(token, { maxShards: "auto" });
 
 async function update(): Promise<void> {
 	const proms: Array<Promise<void>> = [];
@@ -18,7 +18,8 @@ async function update(): Promise<void> {
 	await Promise.all(proms);
 }
 
-bot.on("messageCreate", msg => {
+bot.on("messageCreate", m => {
+	const msg = m as Message<TextChannel>; // assert channel is in cache as code previously assumed
 	if (msg.author.bot) {
 		return;
 	}
@@ -162,7 +163,7 @@ bot.on("ready", () => {
 	update().then(() => console.log("Ready to go!"));
 	setInterval(() => {
 		const chan = bot.getChannel("211204089361465344");
-		if (chan instanceof Eris.TextChannel) {
+		if (chan instanceof TextChannel) {
 			chan
 				.createMessage("Updating!")
 				.then(msg => {
